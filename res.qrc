@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/fireboy.jpg</file>
+        <file>images/maya_bg.png</file>
+        <file>images/run_0.png</file>
+        <file>images/run_1.png</file>
+        <file>images/run_2.png</file>
+        <file>images/run_3.png</file>
+        <file>images/run_4.png</file>
+        <file>images/run_5.png</file>
+        <file>images/run_6.png</file>
+        <file>images/run_7.png</file>
+        <file>images/run_8.png</file>
+        <file>images/run_9.png</file>
+        <file>images/run_10.png</file>
+        <file>images/run_11.png</file>
+    </qresource>
+</RCC>

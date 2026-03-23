@@ -1,0 +1,16 @@
+debug/arrow.o
+debug/caesarpuzzle.o
+debug/main.o
+debug/GameWindow.o
+debug/Player.o
+debug/railfencepuzzle.o
+debug/startscreen.o
+debug/videoplayer.o
+debug/qrc_res.o
+debug/moc_GameWindow.o
+debug/moc_Player.o
+debug/moc_arrow.o
+debug/moc_caesarpuzzle.o
+debug/moc_railfencepuzzle.o
+debug/moc_startscreen.o
+debug/moc_videoplayer.o
