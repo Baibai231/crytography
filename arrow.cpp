@@ -1,28 +1,35 @@
 #include "Arrow.h"
 #include <QGraphicsScene>
-
-#include <QPainter>
-#include <QPen>
+#include <QPixmap>
+#include <QTransform>
+#include <QDebug>
 
 Arrow::Arrow(qreal x, qreal y, qreal dir) : direction(dir) {
-    // 绘制一支简单的箭（如果你有图片可以用 QPixmap）
-    QPixmap pix(30, 10);
-    pix.fill(Qt::transparent);
-    QPainter painter(&pix);
-    painter.setPen(QPen(Qt::black, 2));
-    painter.drawLine(0, 5, 30, 5); // 箭身
-    painter.drawLine(25, 0, 30, 5); // 箭头
-    painter.drawLine(25, 10, 30, 5);
 
-    // 如果向左射，翻转图片
-    if (direction < 0) {
-        setPixmap(pix.transformed(QTransform().scale(-1, 1)));
-    } else {
-        setPixmap(pix);
+    // ✅ 1. 加载图片（改成你的路径）
+    QPixmap pix(":/images/arrow.png");   // ⭐ 推荐用资源路径
+    // 如果你不是用资源系统：
+    // QPixmap pix("arrow.png");
+
+    if (pix.isNull()) {
+        qDebug() << "箭图片加载失败！";
     }
 
+    // ✅ 2. 放大一点（避免太小检测不到）
+    pix = pix.scaled(100, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    // ✅ 3. 根据方向翻转
+    if (direction < 0) {
+        pix = pix.transformed(QTransform().scale(-1, 1));
+    }
+
+    setPixmap(pix);
+
+    // ✅ 4. 设置位置（稍微往中间对齐）
     setPos(x, y);
-    setData(0, "Arrow"); // 标记为箭
+
+    // ✅ 5. 标记类型（非常重要）
+    setData(0, "Arrow");
 }
 
 void Arrow::advance(int phase) {
@@ -30,14 +37,14 @@ void Arrow::advance(int phase) {
 
     setPos(x() + speed * direction, y());
 
-    // 只有速度不为0时才移动
-    if (speed != 0) {
-        setPos(x() + speed, y());
-    }
-
-    // 走出屏幕外自动销毁，释放内存
     if (x() < -100 || x() > 900) {
         scene()->removeItem(this);
         delete this;
     }
+}
+
+QPainterPath Arrow::shape() const {
+    QPainterPath path;
+    path.addRect(boundingRect()); // ✅ 用矩形保证命中
+    return path;
 }
