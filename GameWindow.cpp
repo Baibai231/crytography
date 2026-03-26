@@ -159,3 +159,4 @@ void GameWindow::drawBackground(QPainter *painter, const QRectF &rect)
         painter->fillRect(targetRect, QColor(240, 240, 240));
     }
 }
+
