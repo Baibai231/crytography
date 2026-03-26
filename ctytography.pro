@@ -6,12 +6,16 @@ CONFIG += c++17
 SOURCES += \
     arrow.cpp \
     caesarpuzzle.cpp \
+    inputcontroller.cpp \
+    levelmanager.cpp \
     main.cpp \
     GameWindow.cpp \
     Player.cpp \
+    puzzlemanager.cpp \
     railfencepuzzle.cpp \
     startscreen.cpp \
-    videoplayer.cpp
+    uimanager.cpp \
+    videocontroller.cpp
 
 # 确保这两个 h 都在列表里
 HEADERS += \
@@ -19,10 +23,14 @@ HEADERS += \
     Player.h \
     arrow.h \
     caesarpuzzle.h \
+    inputcontroller.h \
+    levelmanager.h \
+    puzzlemanager.h \
     railfencepuzzle.h \
     startscreen.h \
     terrainblock.h \
-    videoplayer.h
+    uimanager.h \
+    videocontroller.h
 
 # 只有你创建了资源文件才保留这行
 RESOURCES += \

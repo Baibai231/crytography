@@ -24,7 +24,6 @@ VideoPlayer::VideoPlayer(const QString &videoPath, QWidget *parent)
     // 使用 QTimer::singleShot 是一种非常优雅的模拟异步操作的方法
     QTimer::singleShot(3000, this, [this]() {
         emit finished();
-        this->close();
     });
 }
 
