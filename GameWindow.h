@@ -1,18 +1,29 @@
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
-#include <QWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QTimer>
 #include <functional>
-#include "Player.h"
+#include <QPixmap>
+
+class Player;
+class LevelManager;
+class InputController;
+class UIManager;
+class PuzzleManager;
+class VideoController;
 
 class GameWindow : public QGraphicsView {
+    Q_OBJECT
+
 public:
     explicit GameWindow(QWidget *parent = nullptr);
+
     void setBackToMenuHandler(const std::function<void()> &handler);
     void startNewGame();
+
+    QPixmap applyOpacity(const QPixmap &source, qreal opacity);
 
 protected:
     void showEvent(QShowEvent *event) override;
@@ -20,23 +31,26 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void drawBackground(QPainter *painter, const QRectF &rect) override;
 
+
 private:
     QGraphicsScene *scene = nullptr;
-    QGraphicsView *view = nullptr;
-    Player *player = nullptr;
     QTimer *gameTimer = nullptr;
 
-    void loadMap(int level);
-    void clearLevel();
-    void restartCurrentLevel();
+    // 新模块
+    LevelManager *levelManager = nullptr;
+    InputController *inputController = nullptr;
+    UIManager *uiManager = nullptr;
+    PuzzleManager *puzzleManager = nullptr;
+    VideoController *videoController = nullptr;
+
+    Player *player = nullptr;
+
+    std::function<void()> backToMenuHandler;
+
     void onPlayerDead();
     void onReachedDoor();
 
-    int currentLevel = 1;
     QPixmap cachedBackground;
-    std::function<void()> backToMenuHandler;
-
-    QPixmap applyOpacity(const QPixmap &source, qreal opacity);
 };
 
 #endif
