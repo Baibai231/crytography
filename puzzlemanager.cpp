@@ -20,3 +20,5 @@ bool PuzzleManager::runPuzzle(int level, QWidget *parent) {
     // 默认情况（防御性编程）
     return false;
 }
+
+

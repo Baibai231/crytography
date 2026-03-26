@@ -1,5 +1,5 @@
 #include "StartScreen.h"
-#include <QMessageBox>
+#include "UIManager.h"
 
 StartScreen::StartScreen(QWidget *parent) : QWidget(parent) {
     setFixedSize(800, 600);
@@ -58,16 +58,18 @@ void StartScreen::applyStyle() {
 }
 
 void StartScreen::showHowToPlay() {
-    QMessageBox::information(this, "游戏玩法",
-                             "A 键：向左移动\n"
-                             "D 键：向右移动\n"
-                             "W 键：跳跃\n\n"
-                             "躲避悬崖，到达终点！");
+    UIManager::showInfoDialog("游戏玩法",
+                              "A 键：向左移动\n"
+                              "D 键：向右移动\n"
+                              "W 键：跳跃\n\n"
+                              "躲避陷阱，抵达石门并破解密码机关。",
+                              this);
 }
 
 void StartScreen::showReleaseNotes() {
-    QMessageBox::information(this, "发行说明",
-                             "版本：v1.0.0\n"
-                             "开发者：Gemini AI 协作\n"
-                             "功能：基础物理引擎、碰撞检测、死亡重开。");
+    UIManager::showInfoDialog("发行说明",
+                              "版本：v1.0.0\n"
+                              "开发者：Gemini AI 协作\n"
+                              "功能：基础物理引擎、碰撞检测、死亡重开与密码解谜。",
+                              this);
 }
