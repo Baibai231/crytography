@@ -17,7 +17,10 @@ private slots:
 
 private:
     QLineEdit *inputEdit;
-    QString answer = "HELLOWORLD"; // 对应密文 HLOOLRDELW 的原文
+
+    QString answer = "HELLOWORLD"; // 保留你的答案（虽然当前cpp没用）
+
+    void shakeWindow();  // ✅ 必须新增（用于震动效果）
 };
 
 #endif
