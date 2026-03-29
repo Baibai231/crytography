@@ -14,6 +14,7 @@ SOURCES += \
     puzzlemanager.cpp \
     railfencepuzzle.cpp \
     startscreen.cpp \
+    terrainblock.cpp \
     uimanager.cpp \
     videocontroller.cpp
 

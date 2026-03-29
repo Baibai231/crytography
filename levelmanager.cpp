@@ -63,13 +63,11 @@ void LevelManager::loadLevel(int level) {
             TerrainBlock *b = new TerrainBlock(c * TILE, r * TILE + 200, TILE);
 
             if (val == 1) {
-                b->setData(0, "Ground");
+                b->setBlockType("Ground");
             } else if (val == 2) {
-                b->setBrush(Qt::yellow);
-                b->setData(0, "Trap");
+                b->setBlockType("Trap");
             } else if (val == 3) {
-                b->setBrush(Qt::darkCyan);
-                b->setData(0, "Door");
+                b->setBlockType("Door");
             }
 
             scene->addItem(b);
