@@ -1,44 +1,132 @@
 #include "CaesarPuzzle.h"
+#include "UIManager.h"
+
 #include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
+#include <QFrame>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QRandomGenerator>
-#include <QMessageBox>
 
 CaesarPuzzle::CaesarPuzzle(QWidget *parent) : QDialog(parent) {
     setWindowTitle("古老的封印");
-    setFixedSize(400, 280);
-    // 使用 QSS 设置深色系解谜风格
-    setStyleSheet("QDialog { background-color: #2c3e50; } "
-                  "QLabel { color: #ecf0f1; font-family: 'Microsoft YaHei'; }");
+    setFixedSize(460, 400);
+    setStyleSheet(R"(
+        QDialog {
+            background-color: #161a20;
+        }
+        QLabel {
+            color: #efe7d8;
+            font-family: 'Microsoft YaHei';
+        }
+        QLabel[role="title"] {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e4b45f;
+        }
+        QLabel[role="subtitle"] {
+            color: #e2d5bd;
+            font-size: 14px;
+        }
+        QFrame[role="panel"] {
+            background-color: rgba(44, 31, 22, 170);
+            border: 1px solid rgba(228, 180, 95, 95);
+            border-radius: 14px;
+        }
+        QLabel[role="cipher"] {
+            color: #ffd58a;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+        QLabel[role="hint"] {
+            color: #eadfca;
+            font-size: 15px;
+        }
+        QLabel[role="offset"] {
+            color: #ffe29f;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        QLineEdit {
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 2px solid #6b5638;
+            border-radius: 8px;
+            background-color: #f8f3e8;
+            color: #231912;
+        }
+        QLineEdit:focus {
+            border-color: #e4b45f;
+        }
+        QPushButton {
+            background-color: #d7a84e;
+            color: #1f160e;
+            font-weight: 700;
+            min-height: 44px;
+            border-radius: 8px;
+            font-size: 17px;
+            border: none;
+        }
+        QPushButton:hover {
+            background-color: #ecc166;
+        }
+        QPushButton:pressed {
+            background-color: #c8973f;
+        }
+    )");
 
     setupPuzzle(); // 初始化题目
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setSpacing(15);
+    layout->setContentsMargins(28, 26, 28, 26);
+    layout->setSpacing(18);
 
-    QLabel *title = new QLabel("<b>石门上的刻痕</b>", this);
-    title->setStyleSheet("font-size: 22px; color: #f1c40f;"); // 金色标题
+    QLabel *title = new QLabel("石门上的刻痕", this);
+    title->setProperty("role", "title");
     title->setAlignment(Qt::AlignCenter);
 
-    infoLabel = new QLabel(this);
-    infoLabel->setText(QString("密文: <font color='#e74c3c' size='6'>%1</font><br>提示（偏移量）: %2")
-                           .arg(encryptedText).arg(offset));
+    QLabel *subtitle = new QLabel("观察刻痕规律，输入正确咒语解除封印", this);
+    subtitle->setProperty("role", "subtitle");
+    subtitle->setAlignment(Qt::AlignCenter);
+
+    QFrame *panel = new QFrame(this);
+    panel->setProperty("role", "panel");
+    panel->setMinimumHeight(150);
+
+    QVBoxLayout *panelLayout = new QVBoxLayout(panel);
+    panelLayout->setContentsMargins(20, 20, 20, 20);
+    panelLayout->setSpacing(14);
+
+    QLabel *cipherTitle = new QLabel("当前密文", panel);
+    cipherTitle->setProperty("role", "hint");
+    cipherTitle->setAlignment(Qt::AlignCenter);
+
+    infoLabel = new QLabel(encryptedText, panel);
+    infoLabel->setProperty("role", "cipher");
     infoLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel *offsetLabel = new QLabel(QString("偏移量提示：%1").arg(offset), panel);
+    offsetLabel->setProperty("role", "offset");
+    offsetLabel->setAlignment(Qt::AlignCenter);
+
+    panelLayout->addWidget(cipherTitle);
+    panelLayout->addWidget(infoLabel);
+    panelLayout->addWidget(offsetLabel);
 
     inputEdit = new QLineEdit(this);
     inputEdit->setPlaceholderText("在此键入解密后的咒语...");
-    inputEdit->setStyleSheet("padding: 10px; font-size: 16px; border: 2px solid #34495e; border-radius: 5px;");
     inputEdit->setAlignment(Qt::AlignCenter);
 
     QPushButton *btn = new QPushButton("破译封印", this);
     btn->setCursor(Qt::PointingHandCursor);
-    btn->setStyleSheet("QPushButton { background-color: #27ae60; color: white; font-weight: bold; height: 45px; border-radius: 5px; font-size: 18px; }"
-                       "QPushButton:hover { background-color: #2ecc71; }");
+    connect(inputEdit, &QLineEdit::returnPressed, this, &CaesarPuzzle::checkAnswer);
 
     layout->addWidget(title);
-    layout->addWidget(infoLabel);
+    layout->addWidget(subtitle);
+    layout->addWidget(panel);
+    layout->addSpacing(10);
     layout->addWidget(inputEdit);
     layout->addWidget(btn);
 
@@ -65,10 +153,10 @@ void CaesarPuzzle::setupPuzzle() {
 
 void CaesarPuzzle::checkAnswer() {
     if (inputEdit->text().trimmed().toUpper() == answer) {
-        QMessageBox::information(this, "成功", "石门发出沉重的响声，缓缓开启了！");
+        UIManager::showInfoDialog("成功", "石门发出沉重的响声，缓缓开启了！", this);
         accept(); // 关闭对话框并返回 QDialog::Accepted
     } else {
-        QMessageBox::critical(this, "失败", "咒语无效，请重新审视密文。");
+        UIManager::showErrorDialog("失败", "咒语无效，请重新审视密文。", this);
         reject();
     }
 }

@@ -2,19 +2,36 @@
 #define TERRAINBLOCK_H
 
 #include <QGraphicsRectItem>
-#include <QBrush>
-#include <QPen> // 必须包含此头文件以处理 setPen(Qt::NoPen)
+#include <QString>
+
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
 
 class TerrainBlock : public QGraphicsRectItem {
 public:
-    TerrainBlock(int x, int y, int size) {
-        setRect(0, 0, size, size);
+    explicit TerrainBlock(int x, int y, int size)
+        : QGraphicsRectItem(0, 0, size, size), blockSize(size)
+    {
         setPos(x, y);
-        setBrush(QBrush(Qt::darkGray));
-        // 修正：Qt::NoPen 需要 QPen 的完整定义支持
-        setPen(Qt::NoPen);
         setData(0, "Ground");
     }
+
+    void setBlockType(const QString &type)
+    {
+        blockType = type;
+        setData(0, type);
+        update();
+    }
+
+protected:
+    void paint(QPainter *painter,
+               const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
+
+private:
+    int blockSize = 0;
+    QString blockType = "Ground";
 };
 
 #endif
