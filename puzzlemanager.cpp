@@ -4,12 +4,12 @@
 
 #include <QDialog>
 
-PuzzleManager::PuzzleManager(QObject *parent)
-    : QObject(parent) {}
+PuzzleManager::PuzzleManager(AIManager *manager,QObject *parent)
+    : QObject(parent), aiManager(manager) {}
 
 bool PuzzleManager::runPuzzle(int level, QWidget *parent) {
     if (level == 1) {
-        CaesarPuzzle puzzle(parent);
+        CaesarPuzzle puzzle(aiManager,parent);
         return (puzzle.exec() == QDialog::Accepted);
     }
     else if (level == 2) {

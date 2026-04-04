@@ -1,5 +1,7 @@
 #include "CaesarPuzzle.h"
-#include "UIManager.h"
+#include "aimanager.h"
+#include "uimanager.h"
+#include "aichatdialog.h"
 
 #include <QLineEdit>
 #include <QLabel>
@@ -9,7 +11,8 @@
 #include <QHBoxLayout>
 #include <QRandomGenerator>
 
-CaesarPuzzle::CaesarPuzzle(QWidget *parent) : QDialog(parent) {
+CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent), aiManager(manager) {
+
     setWindowTitle("古老的封印");
     setFixedSize(460, 400);
     setStyleSheet(R"(
@@ -107,7 +110,7 @@ CaesarPuzzle::CaesarPuzzle(QWidget *parent) : QDialog(parent) {
     infoLabel->setProperty("role", "cipher");
     infoLabel->setAlignment(Qt::AlignCenter);
 
-    QLabel *offsetLabel = new QLabel(QString("偏移量提示：%1").arg(offset), panel);
+    QLabel *offsetLabel = new QLabel("偏移量未知，需要自行推理", panel);
     offsetLabel->setProperty("role", "offset");
     offsetLabel->setAlignment(Qt::AlignCenter);
 
@@ -123,6 +126,9 @@ CaesarPuzzle::CaesarPuzzle(QWidget *parent) : QDialog(parent) {
     btn->setCursor(Qt::PointingHandCursor);
     connect(inputEdit, &QLineEdit::returnPressed, this, &CaesarPuzzle::checkAnswer);
 
+    QPushButton *hintBtn = new QPushButton("询问神秘提示", this);
+    hintBtn->setCursor(Qt::PointingHandCursor);
+
     layout->addWidget(title);
     layout->addWidget(subtitle);
     layout->addWidget(panel);
@@ -130,8 +136,14 @@ CaesarPuzzle::CaesarPuzzle(QWidget *parent) : QDialog(parent) {
     layout->addWidget(inputEdit);
     layout->addWidget(btn);
 
+    layout->addWidget(hintBtn);
     // 连接信号
     connect(btn, &QPushButton::clicked, this, &CaesarPuzzle::checkAnswer);
+
+    connect(hintBtn, &QPushButton::clicked, this, [=]() {
+        AIChatDialog dialog(aiManager, this);
+        dialog.exec();
+    });
 }
 
 void CaesarPuzzle::setupPuzzle() {

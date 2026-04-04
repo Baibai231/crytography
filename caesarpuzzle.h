@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "aimanager.h"
+
 // 前向声明，减少头文件依赖
 class QLineEdit;
 class QLabel;
@@ -11,7 +13,7 @@ class CaesarPuzzle : public QDialog {
     Q_OBJECT
 
 public:
-    explicit CaesarPuzzle(QWidget *parent = nullptr);
+    explicit CaesarPuzzle(AIManager *manager,QWidget *parent = nullptr);
 
 private slots:
     void checkAnswer(); // 检查玩家输入的槽函数
@@ -25,6 +27,9 @@ private:
 
     QLabel *infoLabel;
     QLineEdit *inputEdit;
+
+    AIManager* aiManager;
+
 
 protected:
     // 当点击对话框右上角“X”关闭时，Qt 默认会触发 reject()

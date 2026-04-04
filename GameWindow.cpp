@@ -2,9 +2,10 @@
 
 #include "LevelManager.h"
 #include "InputController.h"
-#include "UIManager.h"
+#include "aimanager.h"
 #include "PuzzleManager.h"
 #include "VideoController.h"
+#include "uimanager.h"
 
 #include <QKeyEvent>
 #include <QPainter>
@@ -21,11 +22,15 @@ GameWindow::GameWindow(QWidget *parent)
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, scene, &QGraphicsScene::advance);
 
+    aiManager = new AIManager(this);
+    aiManager->setApiKey("sk-***");
+
+
     // 初始化各个模块
     levelManager = new LevelManager(scene, this);
     inputController = new InputController();
-    uiManager = new UIManager(this);
-    puzzleManager = new PuzzleManager(this);
+
+    puzzleManager = new PuzzleManager(aiManager,this);
     videoController = new VideoController(this);
 
     // 信号连接
@@ -35,6 +40,17 @@ GameWindow::GameWindow(QWidget *parent)
     setFixedSize(800, 600);
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
+
+    // 接收AI回复
+    connect(aiManager, &AIManager::responseReady, this, [=](QString reply){
+        qDebug() << "AI:" << reply;
+
+        // TODO：后面接UI显示
+    });
+
+    connect(aiManager, &AIManager::errorOccurred, this, [=](QString err){
+        qDebug() << "AI Error:" << err;
+    });
 }
 
 void GameWindow::setBackToMenuHandler(const std::function<void()> &handler) {
