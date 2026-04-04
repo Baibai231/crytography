@@ -30,33 +30,57 @@ StartScreen::StartScreen(QWidget *parent) : QWidget(parent) {
 }
 
 void StartScreen::applyStyle() {
+
     // 这里是你后期优化“形态、颜色”的核心区域
+
     // 使用 QSS 语法，非常方便调整
+
     QString style = R"(
+
         QWidget {
-            background-color: #2c3e50;
+
+            background-color: #2c1f16;
+
         }
+
         QLabel {
-            color: #ecf0f1;
+
+            color: #f8f3e8;
+
             font-size: 50px;
+
             font-weight: bold;
+
             font-family: "Microsoft YaHei";
+
         }
+
         QPushButton {
-            background-color: #3498db;
+
+            background-color: #d7a84e;
+
             color: white;
+
             border-radius: 10px;
+
             padding: 10px;
+
             min-width: 200px;
+
             font-size: 20px;
+
         }
+
         QPushButton:hover {
-            background-color: #2980b9; /* 鼠标悬停变色 */
+
+            background-color: #c8973f; /* 鼠标悬停变色 */
+
         }
+
     )";
+
     this->setStyleSheet(style);
 }
-
 void StartScreen::showHowToPlay() {
     UIManager::showInfoDialog("游戏玩法",
                               "A 键：向左移动\n"
@@ -69,7 +93,7 @@ void StartScreen::showHowToPlay() {
 void StartScreen::showReleaseNotes() {
     UIManager::showInfoDialog("发行说明",
                               "版本：v1.0.0\n"
-                              "开发者：Gemini AI 协作\n"
+                              "开发者：Baibai\n"
                               "功能：基础物理引擎、碰撞检测、死亡重开与密码解谜。",
                               this);
 }

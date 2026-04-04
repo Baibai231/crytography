@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <functional>
 #include <QPixmap>
+#include "aimanager.h"
 
 class Player;
 class LevelManager;
@@ -51,6 +52,8 @@ private:
     void onReachedDoor();
 
     QPixmap cachedBackground;
+
+    AIManager* aiManager;
 };
 
 #endif

@@ -4,6 +4,8 @@ CONFIG += c++17
 
 # 确保这三个 cpp 都在列表里
 SOURCES += \
+    aichatdialog.cpp \
+    aimanager.cpp \
     arrow.cpp \
     caesarpuzzle.cpp \
     inputcontroller.cpp \
@@ -22,6 +24,8 @@ SOURCES += \
 HEADERS += \
     GameWindow.h \
     Player.h \
+    aichatdialog.h \
+    aimanager.h \
     arrow.h \
     caesarpuzzle.h \
     inputcontroller.h \
