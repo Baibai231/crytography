@@ -1,12 +1,15 @@
 #pragma once
 
 #include <QDialog>
+#include <QJsonArray>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QScrollArea>
 #include "aimanager.h"
+
+class QResizeEvent;
 
 class AIChatDialog : public QDialog {
     Q_OBJECT
@@ -24,9 +27,15 @@ private:
     QLineEdit *inputEdit;
     QScrollArea *chatScrollArea;
     QWidget *chatContainer;
+    QPushButton *sendButton = nullptr;
+    QJsonArray conversationHistory;
+    PuzzleContext puzzleContext;
+    bool waitingForReply = false;
     int askCount = 0;
     const int maxAsk = 3;
 
     void addMessage(const QString &text, bool isUser);
     void updateMessageBubbleWidths();
+    void updateInputState();
+    void sendMessage();
 };

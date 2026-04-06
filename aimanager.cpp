@@ -12,36 +12,37 @@ AIManager::AIManager(QObject *parent)
             this, &AIManager::onReplyFinished);
 }
 
-QString AIManager::buildPrompt(const PuzzleContext &context, const QString &playerInput)
+QString AIManager::buildSystemPrompt(const PuzzleContext &context)
 {
     QString prompt = "你是一个解谜助手。\n"
                      "规则：\n"
                      "1. 只能提供提示，不能直接给出答案\n"
                      "2. 不要输出完整解密结果\n"
                      "3. 引导玩家逐步思考\n"
-                     "4. 提供简短、有启发性的提示\n\n";
+                     "4. 提供简短、有启发性的提示\n"
+                     "5. 这是连续对话，请结合已有对话历史继续回答\n\n";
 
     prompt += "当前谜题类型：" + context.type + "\n";
     prompt += "谜题内容：" + context.content + "\n";
     prompt += "玩家当前进度：" + context.progress + "\n";
-    prompt += "玩家提问：" + playerInput + "\n\n";
-    prompt += "请给出下一步提示：";
+    prompt += "请基于后续对话历史继续给出下一步提示。";
 
     return prompt;
 }
 
-void AIManager::askAI(const PuzzleContext &context, const QString &playerInput)
+void AIManager::askAI(const PuzzleContext &context, const QJsonArray &conversationHistory)
 {
 
     //debug
     if (apiKey.isEmpty()) {
         qDebug() << "ERROR: API Key is empty!";
+        emit errorOccurred("API Key 未配置");
         return;
     }
     qDebug() << "apiKey in askAI:" << apiKey;
 
 
-    QString prompt = buildPrompt(context, playerInput);
+    QString systemPrompt = buildSystemPrompt(context);
 
     QUrl url("https://api.deepseek.com/v1/chat/completions");
     QNetworkRequest request(url);
@@ -55,12 +56,28 @@ void AIManager::askAI(const PuzzleContext &context, const QString &playerInput)
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", ("Bearer " + apiKey).toUtf8());
 
-    QJsonObject message;
-    message["role"] = "user";
-    message["content"] = prompt;
-
     QJsonArray messages;
-    messages.append(message);
+
+    QJsonObject systemMessage;
+    systemMessage["role"] = "system";
+    systemMessage["content"] = systemPrompt;
+    messages.append(systemMessage);
+
+    for (const QJsonValue &messageValue : conversationHistory) {
+        if (!messageValue.isObject()) {
+            continue;
+        }
+
+        const QJsonObject messageObject = messageValue.toObject();
+        const QString role = messageObject["role"].toString();
+        const QString content = messageObject["content"].toString();
+
+        if (role.isEmpty() || content.isEmpty()) {
+            continue;
+        }
+
+        messages.append(messageObject);
+    }
 
     QJsonObject body;
     body["model"] = "deepseek-chat";

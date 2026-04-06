@@ -2,8 +2,11 @@
 
 #include <QFontMetrics>
 #include <QFrame>
+#include <QJsonObject>
 #include <QLabel>
 #include <QLayoutItem>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QTimer>
@@ -24,6 +27,10 @@ AIChatDialog::AIChatDialog(AIManager *manager, QWidget *parent)
     resize(420, 500);
     setMinimumSize(360, 420);
 
+    puzzleContext.type = "caesar";
+    puzzleContext.content = "当前谜题";
+    puzzleContext.progress = "玩家提问中";
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     countLabel = new QLabel("剩余提问次数：3", this);
@@ -41,36 +48,35 @@ AIChatDialog::AIChatDialog(AIManager *manager, QWidget *parent)
     chatScrollArea->setFrameShape(QFrame::NoFrame);
 
     inputEdit = new QLineEdit(this);
-    QPushButton *sendBtn = new QPushButton("发送", this);
+    sendButton = new QPushButton("发送", this);
 
     mainLayout->addWidget(countLabel);
     mainLayout->addWidget(chatScrollArea);
     mainLayout->addWidget(inputEdit);
-    mainLayout->addWidget(sendBtn);
+    mainLayout->addWidget(sendButton);
 
-    connect(sendBtn, &QPushButton::clicked, this, [=]() {
-        if (askCount >= maxAsk) return;
-
-        QString text = inputEdit->text().trimmed();
-        if (text.isEmpty()) return;
-
-        addMessage(text, true);
-        inputEdit->clear();
-
-        askCount++;
-        countLabel->setText(QString("剩余提问次数：%1").arg(maxAsk - askCount));
-
-        PuzzleContext ctx;
-        ctx.type = "caesar";
-        ctx.content = "当前谜题";
-        ctx.progress = "玩家提问中";
-
-        aiManager->askAI(ctx, text);
-    });
+    connect(sendButton, &QPushButton::clicked, this, &AIChatDialog::sendMessage);
+    connect(inputEdit, &QLineEdit::returnPressed, this, &AIChatDialog::sendMessage);
 
     connect(aiManager, &AIManager::responseReady, this, [=](QString reply){
+        waitingForReply = false;
+
+        QJsonObject assistantMessage;
+        assistantMessage["role"] = "assistant";
+        assistantMessage["content"] = reply;
+        conversationHistory.append(assistantMessage);
+
         addMessage(reply, false);
+        updateInputState();
     });
+
+    connect(aiManager, &AIManager::errorOccurred, this, [=](QString error) {
+        waitingForReply = false;
+        addMessage("提示请求失败：" + error, false);
+        updateInputState();
+    });
+
+    updateInputState();
 }
 
 void AIChatDialog::resizeEvent(QResizeEvent *event)
@@ -194,4 +200,53 @@ void AIChatDialog::updateMessageBubbleWidths()
     }
 
     chatContainer->adjustSize();
+}
+
+void AIChatDialog::updateInputState()
+{
+    const bool limitReached = askCount >= maxAsk;
+    const bool canSend = !waitingForReply && !limitReached;
+
+    inputEdit->setEnabled(canSend);
+    sendButton->setEnabled(canSend);
+
+    if (waitingForReply) {
+        inputEdit->setPlaceholderText("神秘守护者正在思考...");
+        return;
+    }
+
+    if (limitReached) {
+        inputEdit->setPlaceholderText("提问次数已用完");
+        return;
+    }
+
+    inputEdit->setPlaceholderText("请输入你想追问的内容...");
+}
+
+void AIChatDialog::sendMessage()
+{
+    if (waitingForReply || askCount >= maxAsk) {
+        return;
+    }
+
+    const QString text = inputEdit->text().trimmed();
+    if (text.isEmpty()) {
+        return;
+    }
+
+    addMessage(text, true);
+    inputEdit->clear();
+
+    QJsonObject userMessage;
+    userMessage["role"] = "user";
+    userMessage["content"] = text;
+    conversationHistory.append(userMessage);
+
+    ++askCount;
+    countLabel->setText(QString("剩余提问次数：%1").arg(maxAsk - askCount));
+
+    waitingForReply = true;
+    updateInputState();
+
+    aiManager->askAI(puzzleContext, conversationHistory);
 }
