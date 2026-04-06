@@ -10,6 +10,7 @@
 #include "aimanager.h"
 
 class QResizeEvent;
+class QShowEvent;
 
 class AIChatDialog : public QDialog {
     Q_OBJECT
@@ -19,6 +20,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private:
     AIManager *aiManager;

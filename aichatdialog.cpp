@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QScrollBar>
+#include <QShowEvent>
 #include <QTimer>
 
 namespace {
@@ -83,6 +84,19 @@ void AIChatDialog::resizeEvent(QResizeEvent *event)
 {
     QDialog::resizeEvent(event);
     updateMessageBubbleWidths();
+}
+
+void AIChatDialog::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+
+    QTimer::singleShot(0, this, [this]() {
+        if (!inputEdit || !inputEdit->isEnabled()) {
+            return;
+        }
+
+        inputEdit->setFocus();
+    });
 }
 
 void AIChatDialog::addMessage(const QString &text, bool isUser)
@@ -221,6 +235,14 @@ void AIChatDialog::updateInputState()
     }
 
     inputEdit->setPlaceholderText("请输入你想追问的内容...");
+
+    QTimer::singleShot(0, this, [this]() {
+        if (!inputEdit || !inputEdit->isEnabled()) {
+            return;
+        }
+
+        inputEdit->setFocus();
+    });
 }
 
 void AIChatDialog::sendMessage()
