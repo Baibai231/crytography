@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonArray>
 #include <QJsonObject>
 
 struct PuzzleContext {
@@ -20,7 +21,7 @@ public:
 
     void setApiKey(const QString &key);
 
-    void askAI(const PuzzleContext &context, const QString &playerInput);
+    void askAI(const PuzzleContext &context, const QJsonArray &conversationHistory);
 
 signals:
     void responseReady(const QString &response);
@@ -30,7 +31,7 @@ private slots:
     void onReplyFinished(QNetworkReply *reply);
 
 private:
-    QString buildPrompt(const PuzzleContext &context, const QString &playerInput);
+    QString buildSystemPrompt(const PuzzleContext &context);
 
 private:
     QNetworkAccessManager *networkManager;
