@@ -26,6 +26,8 @@ public:
 
     QPixmap applyOpacity(const QPixmap &source, qreal opacity);
 
+    void handlePuzzleFailed();
+
 protected:
     void showEvent(QShowEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;

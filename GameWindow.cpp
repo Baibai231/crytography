@@ -142,9 +142,7 @@ void GameWindow::onReachedDoor() {
             }
         }
         else {
-            if (player) {
-                player->forceKill();
-            }
+            handlePuzzleFailed();
         }
     });
 }
@@ -176,3 +174,30 @@ void GameWindow::drawBackground(QPainter *painter, const QRectF &rect)
     }
 }
 
+void GameWindow::handlePuzzleFailed() {
+    gameTimer->stop();
+
+    int result = uiManager->showDeathDialog(levelManager->getCurrentLevel(), this);
+
+    if (result == 1) {
+        // 重新开始本关
+        QTimer::singleShot(0, this, [this]() {
+            levelManager->loadLevel(levelManager->getCurrentLevel());
+
+            player = levelManager->getPlayer();
+            inputController->setPlayer(player);
+
+            gameTimer->start(16);
+        });
+    }
+    else if (result == 2) {
+        // 返回菜单
+        hide();
+        if (backToMenuHandler) {
+            backToMenuHandler();
+        }
+    }
+    else {
+        qApp->quit();
+    }
+}

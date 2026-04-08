@@ -198,7 +198,7 @@ void RailFencePuzzle::checkAnswer() {
         shakeWindow();
 
         UIManager::showErrorDialog("错误", "指令错误！请重新输入！", this);
-
+        reject();
         inputEdit->clear();
         inputEdit->setFocus();
     }

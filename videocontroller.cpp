@@ -9,40 +9,67 @@ VideoController::VideoController(QObject *parent)
     : QObject(parent) {}
 
 void VideoController::playVideo(const QString &path, QWidget *parent, std::function<void()> onFinished) {
-    Q_UNUSED(path); // 你现在是模拟视频，可以先不用
+    Q_UNUSED(path);
 
-    // 创建窗口
+    // ===== 1. 创建黑屏窗口 =====
     videoWidget = new QWidget(parent);
     videoWidget->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     videoWidget->setStyleSheet("background-color: black;");
     videoWidget->resize(800, 600);
 
-    // UI
     QVBoxLayout *layout = new QVBoxLayout(videoWidget);
+    layout->setContentsMargins(40, 40, 40, 40);
 
     QLabel *label = new QLabel(videoWidget);
-    label->setText("\n\n石门上的尘土正在落下...\n你感受到一股古老的力量正在苏醒。");
-    label->setStyleSheet("color: #ecf0f1; font-size: 24px; font-family: 'Microsoft YaHei';");
     label->setAlignment(Qt::AlignCenter);
+    label->setWordWrap(true);
+
+    // ===== 2. 风格（重点优化） =====
+    label->setStyleSheet(R"(
+        color: #d8c39a;              /* 暗金色，更符合解谜氛围 */
+        font-size: 22px;
+        font-family: "Consolas", "Courier New", "Microsoft YaHei";
+        letter-spacing: 2px;
+    )");
 
     layout->addWidget(label);
 
-    // 显示
     videoWidget->show();
     videoWidget->raise();
     videoWidget->activateWindow();
 
-    // 3秒后结束
-    QTimer::singleShot(3000, this, [this, onFinished]() {
+    // ===== 3. 打字机文本 =====
+    QString fullText =
+        "石门上的尘土正在落下...\n"
+        "你感受到一股古老的力量正在苏醒。";
 
-        if (videoWidget) {
-            videoWidget->close();
-            videoWidget->deleteLater();
-            videoWidget = nullptr;
-        }
+    int interval = 100; // 每个字间隔(ms) —— 控制打字速度
+    int *index = new int(0);
 
-        if (onFinished) {
-            onFinished();
+    QTimer *typeTimer = new QTimer(this);
+
+    connect(typeTimer, &QTimer::timeout, this, [=]() mutable {
+        if (*index < fullText.length()) {
+            label->setText(label->text() + fullText[*index]);
+            (*index)++;
+        } else {
+            typeTimer->stop();
+
+            // ===== 4. 停留一小段时间再结束 =====
+            QTimer::singleShot(1000, this, [this, onFinished]() {
+
+                if (videoWidget) {
+                    videoWidget->close();
+                    videoWidget->deleteLater();
+                    videoWidget = nullptr;
+                }
+
+                if (onFinished) {
+                    onFinished();
+                }
+            });
         }
     });
+
+    typeTimer->start(interval);
 }
