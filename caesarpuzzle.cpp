@@ -142,6 +142,18 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
 
     connect(hintBtn, &QPushButton::clicked, this, [=]() {
         AIChatDialog dialog(aiManager, this);
+
+        GameState state;
+        state.puzzleType = "caesar";
+        state.encryptedText = encryptedText;
+        state.userInput = "";
+        state.attemptCount = 0;
+        state.solved = false;
+
+        // ✅ 传入AI对话框
+        dialog.setGameState(state);
+
+
         dialog.exec();
     });
 }

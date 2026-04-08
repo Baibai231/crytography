@@ -23,7 +23,7 @@ GameWindow::GameWindow(QWidget *parent)
     connect(gameTimer, &QTimer::timeout, scene, &QGraphicsScene::advance);
 
     aiManager = new AIManager(this);
-    aiManager->setApiKey("sk-***");
+    aiManager->setApiKey("sk-508b8867288c42259b392d2a942bc009");
 
 
     // 初始化各个模块
@@ -42,7 +42,7 @@ GameWindow::GameWindow(QWidget *parent)
     setFocus();
 
     // 接收AI回复
-    connect(aiManager, &AIManager::responseReady, this, [=](QString reply){
+    connect(aiManager, &AIManager::hintReady, this, [=](QString reply){
         qDebug() << "AI:" << reply;
 
         // TODO：后面接UI显示

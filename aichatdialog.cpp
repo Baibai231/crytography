@@ -28,9 +28,10 @@ AIChatDialog::AIChatDialog(AIManager *manager, QWidget *parent)
     resize(420, 500);
     setMinimumSize(360, 420);
 
-    puzzleContext.type = "caesar";
-    puzzleContext.content = "当前谜题";
-    puzzleContext.progress = "玩家提问中";
+
+    gameState.userInput = "";
+    gameState.attemptCount = 0;
+    gameState.solved = false;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -59,7 +60,7 @@ AIChatDialog::AIChatDialog(AIManager *manager, QWidget *parent)
     connect(sendButton, &QPushButton::clicked, this, &AIChatDialog::sendMessage);
     connect(inputEdit, &QLineEdit::returnPressed, this, &AIChatDialog::sendMessage);
 
-    connect(aiManager, &AIManager::responseReady, this, [=](QString reply){
+    connect(aiManager, &AIManager::hintReady, this, [=](QString reply){
         waitingForReply = false;
 
         QJsonObject assistantMessage;
@@ -270,5 +271,15 @@ void AIChatDialog::sendMessage()
     waitingForReply = true;
     updateInputState();
 
-    aiManager->askAI(puzzleContext, conversationHistory);
+    // 更新 GameState
+    gameState.userInput = text;
+    gameState.attemptCount = askCount;
+
+    // 调用新接口
+    aiManager->requestHint(gameState, conversationHistory);
+}
+
+void AIChatDialog::setGameState(const GameState &state)
+{
+    this->gameState = state;
 }

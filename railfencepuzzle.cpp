@@ -1,5 +1,6 @@
 #include "RailFencePuzzle.h"
 #include "UIManager.h"
+#include "aichatdialog.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -9,9 +10,16 @@
 #include <QHBoxLayout>
 #include <QFrame>
 
-RailFencePuzzle::RailFencePuzzle(QWidget *parent) : QDialog(parent) {
+RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(parent), aiManager(manager) {
+
     setWindowTitle("安全终端 - 栅栏锁");
     setFixedSize(500, 520);
+
+    gameState.puzzleType = "rail_fence";
+    gameState.encryptedText = "HLOOLRDELW";
+    gameState.attemptCount = 0;
+    gameState.solved = false;
+
     setStyleSheet(R"(
         QDialog {
             background-color: #151920;
@@ -119,61 +127,32 @@ RailFencePuzzle::RailFencePuzzle(QWidget *parent) : QDialog(parent) {
     QHBoxLayout *topLayout = new QHBoxLayout();
     topLayout->addStretch();
 
-    QPushButton *hintButton = new QPushButton("提示");
-    hintButton->setFixedSize(80, 35);
+    QPushButton *hintButton = new QPushButton("询问神秘提示");
+    hintButton->setFixedSize(140, 36);
     hintButton->setProperty("variant", "secondary");
     hintButton->setCursor(Qt::PointingHandCursor);
     topLayout->addWidget(hintButton);
 
     mainLayout->addLayout(topLayout);
 
+    // ✅ 打开AI聊天窗口（核心修改）
     connect(hintButton, &QPushButton::clicked, this, [=]() {
-        QDialog hintDialog(this);
-        hintDialog.setWindowTitle("提示");
-        hintDialog.setFixedSize(370, 260);
-        hintDialog.setStyleSheet(R"(
-            QDialog {
-                background-color: #1a1f26;
-            }
-            QLabel {
-                color: #efe7d6;
-                font-size: 14px;
-                line-height: 1.5em;
-            }
-            QPushButton {
-                min-height: 36px;
-                border-radius: 8px;
-                background-color: #e39b4a;
-                color: #1e140c;
-                font-weight: 700;
-                border: none;
-            }
-        )");
 
-        QVBoxLayout *layout = new QVBoxLayout(&hintDialog);
-        layout->setContentsMargins(24, 20, 24, 20);
-        layout->setSpacing(14);
+        AIChatDialog dialog(aiManager, this);
 
-        QLabel *hintText = new QLabel(
-            "什么是栅栏密码 (2层)？\n\n"
-            "将字符串拆为两行再组合：\n"
-            "第一行：H L O O L\n"
-            "第二行：E L W R D\n\n"
-            "解密：\n"
-            "前一半 + 后一半 → 上下交替读取"
-             );
+        // ✅ 设置关卡上下文（核心）
+        GameState state;
+        state.puzzleType = "rail_fence";
+        state.encryptedText = gameState.encryptedText;
+        state.userInput = "";
+        state.attemptCount = 0;
+        state.solved = false;
 
-        hintText->setWordWrap(true);
-        QPushButton *closeButton = new QPushButton("明白了", &hintDialog);
-        closeButton->setCursor(Qt::PointingHandCursor);
-        layout->addWidget(hintText);
-        layout->addStretch();
-        layout->addWidget(closeButton);
+        dialog.setGameState(state);
 
-        connect(closeButton, &QPushButton::clicked, &hintDialog, &QDialog::accept);
-
-        hintDialog.exec();
+        dialog.exec();
     });
+
 
     inputEdit = new QLineEdit();
     inputEdit->setPlaceholderText("请输入还原后的明文指令...");
@@ -223,4 +202,11 @@ void RailFencePuzzle::checkAnswer() {
         inputEdit->clear();
         inputEdit->setFocus();
     }
+}
+
+void RailFencePuzzle::requestHint()
+{
+    gameState.attemptCount = attemptCount;
+
+    aiManager->requestHint(gameState, conversationHistory);
 }

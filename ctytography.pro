@@ -8,6 +8,7 @@ SOURCES += \
     aimanager.cpp \
     arrow.cpp \
     caesarpuzzle.cpp \
+    gamestate.cpp \
     inputcontroller.cpp \
     levelmanager.cpp \
     main.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     aimanager.h \
     arrow.h \
     caesarpuzzle.h \
+    gamestate.h \
     inputcontroller.h \
     levelmanager.h \
     puzzlemanager.h \

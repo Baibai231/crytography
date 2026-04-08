@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QScrollArea>
 #include "aimanager.h"
+#include "gamestate.h"
 
 class QResizeEvent;
 class QShowEvent;
@@ -17,6 +18,8 @@ class AIChatDialog : public QDialog {
 
 public:
     explicit AIChatDialog(AIManager *manager, QWidget *parent = nullptr);
+
+    void setGameState(const GameState &state);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -31,7 +34,8 @@ private:
     QWidget *chatContainer;
     QPushButton *sendButton = nullptr;
     QJsonArray conversationHistory;
-    PuzzleContext puzzleContext;
+
+    GameState gameState;
     bool waitingForReply = false;
     int askCount = 0;
     const int maxAsk = 3;
