@@ -2,6 +2,7 @@
 #include "aimanager.h"
 #include "uimanager.h"
 #include "aichatdialog.h"
+#include "spinwheeldialog.h"
 
 #include <QLineEdit>
 #include <QLabel>
@@ -122,6 +123,10 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
     inputEdit->setPlaceholderText("在此键入解密后的咒语...");
     inputEdit->setAlignment(Qt::AlignCenter);
 
+    QPushButton *visualBtn = new QPushButton("进入解密转盘", this);
+    visualBtn->setCursor(Qt::PointingHandCursor);
+
+
     QPushButton *btn = new QPushButton("破译封印", this);
     btn->setCursor(Qt::PointingHandCursor);
     connect(inputEdit, &QLineEdit::returnPressed, this, &CaesarPuzzle::checkAnswer);
@@ -134,11 +139,37 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
     layout->addWidget(panel);
     layout->addSpacing(10);
     layout->addWidget(inputEdit);
-    layout->addWidget(btn);
 
-    layout->addWidget(hintBtn);
+
+    QHBoxLayout *bottomLayout = new QHBoxLayout();
+    bottomLayout->setSpacing(12);
+    bottomLayout->setContentsMargins(0, 0, 0, 0);
+
+    hintBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    visualBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    hintBtn->setMinimumHeight(42);
+    visualBtn->setMinimumHeight(42);
+
+    bottomLayout->addWidget(hintBtn);
+    bottomLayout->addWidget(visualBtn);
+
+    layout->addWidget(btn);
+    layout->addLayout(bottomLayout);
+
     // 连接信号
     connect(btn, &QPushButton::clicked, this, &CaesarPuzzle::checkAnswer);
+
+    connect(visualBtn, &QPushButton::clicked, this, [=]() {
+
+        SpinWheelDialog *dlg = new SpinWheelDialog(
+            encryptedText,
+            answer,
+            offset,
+            this
+            );
+
+        dlg->exec();
+    });
 
     connect(hintBtn, &QPushButton::clicked, this, [=]() {
         AIChatDialog dialog(aiManager, this);
