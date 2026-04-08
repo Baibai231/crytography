@@ -156,7 +156,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
 
     inputEdit = new QLineEdit();
     inputEdit->setPlaceholderText("请输入还原后的明文指令...");
-    inputEdit->setFixedHeight(35);
+    inputEdit->setFixedHeight(45);
     mainLayout->addWidget(inputEdit);
 
     connect(inputEdit, &QLineEdit::returnPressed, this, &RailFencePuzzle::checkAnswer);
