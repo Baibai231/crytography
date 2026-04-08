@@ -13,7 +13,7 @@ bool PuzzleManager::runPuzzle(int level, QWidget *parent) {
         return (puzzle.exec() == QDialog::Accepted);
     }
     else if (level == 2) {
-        RailFencePuzzle puzzle(parent);
+        RailFencePuzzle puzzle(aiManager,parent);
         return (puzzle.exec() == QDialog::Accepted);
     }
 

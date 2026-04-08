@@ -2,6 +2,7 @@
 
 #include <QJsonArray>
 #include <QJsonDocument>
+//#include <QDebug>
 
 AIManager::AIManager(QObject *parent)
     : QObject(parent)
@@ -12,77 +13,87 @@ AIManager::AIManager(QObject *parent)
             this, &AIManager::onReplyFinished);
 }
 
-QString AIManager::buildSystemPrompt(const PuzzleContext &context)
+QString AIManager::buildSystemPrompt(const GameState &state, const QString &mode)
 {
-    QString prompt = "你是一个解谜助手。\n"
-                     "规则：\n"
-                     "1. 只能提供提示，不能直接给出答案\n"
-                     "2. 不要输出完整解密结果\n"
-                     "3. 引导玩家逐步思考\n"
-                     "4. 提供简短、有启发性的提示\n"
-                     "5. 这是连续对话，请结合已有对话历史继续回答\n\n";
+    QString prompt;
 
-    prompt += "当前谜题类型：" + context.type + "\n";
-    prompt += "谜题内容：" + context.content + "\n";
-    prompt += "玩家当前进度：" + context.progress + "\n";
-    prompt += "请基于后续对话历史继续给出下一步提示。";
+    prompt += "你是一个专业的密码学解谜AI助手。\n";
+    prompt += "规则：\n";
+    prompt += "1. 只能提供提示，不能直接给答案\n";
+    prompt += "2. 不要输出完整解密结果\n";
+    prompt += "3. 引导玩家思考\n";
+    prompt += "4. 回答要简短\n\n";
+
+    prompt += "【当前游戏状态】\n";
+    prompt += state.toString() + "\n";
+
+    prompt += "【提示策略】\n";
+
+    if (state.attemptCount == 1) {
+        prompt += "当前是第1次提问：只能给模糊思路提示。\n";
+    } else if (state.attemptCount == 2) {
+        prompt += "当前是第2次提问：可以给出解题方向，但不要透露关键结果。\n";
+    } else {
+        prompt += "当前是第3次提问：可以给关键步骤，但仍然不能直接给答案。\n";
+    }
+
+    if (mode == "hint") {
+        prompt += "请给出一个提示。\n";
+    } else if (mode == "step") {
+        prompt += "请告诉玩家下一步应该做什么。\n";
+    }
 
     return prompt;
 }
 
-void AIManager::askAI(const PuzzleContext &context, const QJsonArray &conversationHistory)
+void AIManager::requestHint(const GameState &state, const QJsonArray &history)
 {
+    currentMode = "hint";
+    QString prompt = buildSystemPrompt(state, "hint");
+    sendRequest(prompt, history, "hint");
+}
 
-    //debug
+void AIManager::requestNextStep(const GameState &state, const QJsonArray &history)
+{
+    currentMode = "step";
+    QString prompt = buildSystemPrompt(state, "step");
+    sendRequest(prompt, history, "step");
+}
+
+void AIManager::sendRequest(const QString &prompt,
+                            const QJsonArray &conversationHistory,
+                            const QString &mode)
+{
     if (apiKey.isEmpty()) {
-        qDebug() << "ERROR: API Key is empty!";
         emit errorOccurred("API Key 未配置");
         return;
     }
-    qDebug() << "apiKey in askAI:" << apiKey;
-
-
-    QString systemPrompt = buildSystemPrompt(context);
 
     QUrl url("https://api.deepseek.com/v1/chat/completions");
     QNetworkRequest request(url);
-
-
-    //debug
-    qDebug() << "Request URL:" << request.url();
-
-
 
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Authorization", ("Bearer " + apiKey).toUtf8());
 
     QJsonArray messages;
 
+    // system
     QJsonObject systemMessage;
     systemMessage["role"] = "system";
-    systemMessage["content"] = systemPrompt;
+    systemMessage["content"] = prompt;
     messages.append(systemMessage);
 
-    for (const QJsonValue &messageValue : conversationHistory) {
-        if (!messageValue.isObject()) {
-            continue;
+    // history
+    for (const QJsonValue &val : conversationHistory) {
+        if (val.isObject()) {
+            messages.append(val.toObject());
         }
-
-        const QJsonObject messageObject = messageValue.toObject();
-        const QString role = messageObject["role"].toString();
-        const QString content = messageObject["content"].toString();
-
-        if (role.isEmpty() || content.isEmpty()) {
-            continue;
-        }
-
-        messages.append(messageObject);
     }
 
     QJsonObject body;
     body["model"] = "deepseek-chat";
     body["messages"] = messages;
-    body["temperature"] = 0.7;
+    body["temperature"] = 0.6;
 
     QJsonDocument doc(body);
 
@@ -122,7 +133,11 @@ void AIManager::onReplyFinished(QNetworkReply *reply)
         content = content.left(200) + "...";
     }
 
-    emit responseReady(content);
+    if (currentMode == "hint") {
+        emit hintReady(content);
+    } else if (currentMode == "step") {
+        emit nextStepReady(content);
+    }
 
     reply->deleteLater();
 }
