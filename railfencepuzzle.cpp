@@ -1,6 +1,7 @@
 #include "RailFencePuzzle.h"
 #include "UIManager.h"
 #include "aichatdialog.h"
+#include "RailFenceVisualizer.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -16,7 +17,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
     setFixedSize(500, 520);
 
     gameState.puzzleType = "rail_fence";
-    gameState.encryptedText = "HLOOLRDELW";
+    gameState.encryptedText = "HLOOLELWRD";
     gameState.attemptCount = 0;
     gameState.solved = false;
 
@@ -110,7 +111,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
     QLabel *cipherTitle = new QLabel("截获密文", cipherPanel);
     cipherTitle->setProperty("role", "hint");
 
-    QLabel *cipherLabel = new QLabel("HLOOLRDELW", cipherPanel);
+    QLabel *cipherLabel = new QLabel("HLOOLELWRD", cipherPanel);
     cipherLabel->setProperty("role", "cipher");
     cipherLabel->setAlignment(Qt::AlignCenter);
 
@@ -124,14 +125,28 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
 
     mainLayout->addWidget(cipherPanel);
 
+
+    /* =======================
+   🔥 按钮区域（核心修复）
+   ======================= */
+
     QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->addStretch();
+    topLayout->setSpacing(12);
+    topLayout->setContentsMargins(0, 0, 0, 0);
 
     QPushButton *hintButton = new QPushButton("询问神秘提示");
-    hintButton->setFixedSize(140, 36);
+    hintButton->setFixedHeight(38);
     hintButton->setProperty("variant", "secondary");
     hintButton->setCursor(Qt::PointingHandCursor);
+
+    QPushButton *visualBtn = new QPushButton("进入栅栏可视化解密");
+    visualBtn->setFixedHeight(38);
+    visualBtn->setProperty("variant", "secondary");
+    visualBtn->setCursor(Qt::PointingHandCursor);
+
     topLayout->addWidget(hintButton);
+    topLayout->addStretch();
+    topLayout->addWidget(visualBtn);
 
     mainLayout->addLayout(topLayout);
 
@@ -153,6 +168,15 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
         dialog.exec();
     });
 
+    connect(visualBtn, &QPushButton::clicked, this, [=]() {
+
+        RailFenceVisualizer *viz = new RailFenceVisualizer(
+            gameState.encryptedText,
+            this
+            );
+
+        viz->exec();
+    });
 
     inputEdit = new QLineEdit();
     inputEdit->setPlaceholderText("请输入还原后的明文指令...");
