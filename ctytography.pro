@@ -16,6 +16,7 @@ SOURCES += \
     Player.cpp \
     puzzlemanager.cpp \
     railfencepuzzle.cpp \
+    railfencevisualizer.cpp \
     spinwheeldialog.cpp \
     startscreen.cpp \
     terrainblock.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     levelmanager.h \
     puzzlemanager.h \
     railfencepuzzle.h \
+    railfencevisualizer.h \
     spinwheeldialog.h \
     startscreen.h \
     terrainblock.h \
