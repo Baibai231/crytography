@@ -49,6 +49,8 @@ private:
     void buildUI();
     void buildFence();
     void buildSteps();
+    void updateResultDisplay();
+    QString buildDecodedResult() const;
 
 private:
     QString cipherText;
@@ -66,7 +68,6 @@ private:
     QLabel *resultLabel;
 
     QTimer *animTimer;
-    QTimer *sliderTimer;
 
     QDial *keyDial;
 
