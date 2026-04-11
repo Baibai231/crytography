@@ -1,7 +1,5 @@
 #include "RailFenceVisualizer.h"
 
-#include <QLayoutItem>
-
 // ================= CipherTile =================
 CipherTile::CipherTile(const QString &text, QWidget *parent)
     : QLabel(text, parent) {
@@ -49,6 +47,9 @@ RailFenceVisualizer::RailFenceVisualizer(const QString &cipher, QWidget *parent)
     setFixedSize(750, 500);
 
     animTimer = new QTimer(this);
+    sliderTimer = new QTimer(this);
+
+    sliderTimer->setSingleShot(true);
 
     connect(animTimer, &QTimer::timeout, this, &RailFenceVisualizer::playNextStep);
 
@@ -105,32 +106,27 @@ void RailFenceVisualizer::buildUI()
     slider = new QSlider(Qt::Horizontal);
     slider->setRange(0, cipherText.size());
 
-    connect(slider, &QSlider::valueChanged, this, &RailFenceVisualizer::onSliderChanged);
+    connect(sliderTimer, &QTimer::timeout, this, [=]() {
+        onSliderChanged(slider->value());
+    });
+
+    connect(slider, &QSlider::valueChanged, this, [=](int) {
+        sliderTimer->start(30);
+    });
 
     mainLayout->addWidget(slider);
 
     // ================= 结果显示（🔥新增） =================
     resultLabel = new QLabel("结果：");
     resultLabel->setStyleSheet("font-size:16px;color:#ddd;");
+    resultLabel->setTextFormat(Qt::RichText);
+
     mainLayout->addWidget(resultLabel);
 }
 
 // ================= buildFence =================
 void RailFenceVisualizer::buildFence()
 {
-    while (QLayoutItem *item = fenceLayout->takeAt(0)) {
-        if (QLayout *layout = item->layout()) {
-            while (QLayoutItem *child = layout->takeAt(0)) {
-                if (QWidget *widget = child->widget()) {
-                    widget->deleteLater();
-                }
-                delete child;
-            }
-            delete layout;
-        }
-        delete item;
-    }
-
     for (auto &row : fenceSlots)
         for (auto slot : row)
             slot->deleteLater();
@@ -190,17 +186,16 @@ void RailFenceVisualizer::buildSteps()
 
     path.clear();
 
-    row = 0;
-    dir = 1;
+    int row2 = 0, dir2 = 1;   // ⭐重新开始
 
     for (int col = 0; col < n; col++) {
 
-        path.push_back({row, col});
+        path.push_back({row2, col});
 
-        if (row == 0) dir = 1;
-        else if (row == key - 1) dir = -1;
+        if (row2 == 0) dir2 = 1;
+        else if (row2 == key - 1) dir2 = -1;
 
-        row += dir;
+        row2 += dir2;
     }
 }
 
@@ -230,6 +225,9 @@ void RailFenceVisualizer::reset()
             slot->reset();
 
     slider->setValue(0);
+
+    resultLabel->setText("结果：");
+    resultLabel->setStyleSheet("color:#ddd;");
 }
 
 // ================= 下一步 =================
@@ -240,43 +238,8 @@ void RailFenceVisualizer::playNextStep()
         animTimer->stop();
         isPlaying = false;
 
-        QString result;
+        showResult();
 
-        int n = cipherText.size();
-
-        int row = 0, dir = 1;
-
-        for (int col = 0; col < n; col++) {
-
-            QString ch = fenceSlots[row][col]->text();
-
-            // 如果没有字符 → 空白
-            if (ch.isEmpty()) {
-                ch = " ";
-            }
-
-            result += ch;
-
-            // =================🔥 亮暗判断 =================
-            if (!ch.isEmpty() && col < steps.size()) {
-                fenceSlots[row][col]->setStyleSheet(
-                    "background:#ffcc66;color:black;border-radius:6px;"
-                    );
-            } else {
-                fenceSlots[row][col]->setStyleSheet(
-                    "background:#555;color:#999;border-radius:6px;"
-                    );
-            }
-
-            // W路径移动
-            if (row == 0) dir = 1;
-            else if (row == key - 1) dir = -1;
-
-            row += dir;
-        }
-
-        resultLabel->setText("结果：" + result);
-        updateResultDisplay();
         return;
     }
 
@@ -300,7 +263,36 @@ void RailFenceVisualizer::playNextStep()
 
 void RailFenceVisualizer::showResult()
 {
-    updateResultDisplay();
+    QString result;
+
+    for (auto &p : path) {
+
+        int r = p.first;
+        int c = p.second;
+
+        QString ch = fenceSlots[r][c]->text();
+
+        result += ch.isEmpty() ? " " : ch;
+    }
+
+    QString richText = "结果：";
+
+    for (int i = 0; i < result.size(); i++) {
+
+        QChar c = result[i];
+
+        if (i < targetText.size() && c == targetText[i]) {
+            // 正确 → 亮色
+            richText += "<span style='color:#ffd58a; font-weight:bold;'>"
+                        + QString(c) + "</span>";
+        } else {
+            // 错误 → 灰色
+            richText += "<span style='color:#666;'>"
+                        + QString(c) + "</span>";
+        }
+    }
+
+    resultLabel->setText(richText);
 }
 
 // ================= slider控制 =================
@@ -316,8 +308,7 @@ void RailFenceVisualizer::onSliderChanged(int value)
         const Step &s = steps[i];
         fenceSlots[s.row][s.col]->setChar(s.ch, true);
     }
-
-    updateResultDisplay();
+    showResult();
 }
 
 // ================= key变化 =================
@@ -330,32 +321,5 @@ void RailFenceVisualizer::onKeyChanged(int value)
     buildFence();
     buildSteps();
 
-    updateResultDisplay();
-}
 
-QString RailFenceVisualizer::buildDecodedResult() const
-{
-    QString result;
-
-    for (const auto &position : path) {
-        const int row = position.first;
-        const int col = position.second;
-        const QString ch = fenceSlots[row][col]->text();
-
-        result += ch.isEmpty() ? QStringLiteral(" ") : ch;
-    }
-
-    return result;
-}
-
-void RailFenceVisualizer::updateResultDisplay()
-{
-    const QString result = buildDecodedResult();
-    resultLabel->setText("结果：" + result);
-
-    if (result == targetText) {
-        resultLabel->setStyleSheet("font-size:16px; color:#7CFC00; font-weight:bold;");
-    } else {
-        resultLabel->setStyleSheet("font-size:16px; color:#666666;");
-    }
 }
