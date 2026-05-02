@@ -10,6 +10,7 @@ public:
     // x, y 为发射起点，dir 为方向（1向右，-1向左）
     Arrow(qreal x, qreal y, qreal dir);
     void advance(int phase) override;
+    QPainterPath shape() const override;
 
 private:
     qreal speed = 7.0;

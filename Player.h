@@ -26,6 +26,9 @@ public:
     void setArrowRequestHandler(const std::function<void(qreal)> &handler);
     void setReachedDoorHandler(const std::function<void()> &handler);
 
+    QRectF boundingRect() const override;
+
+
 private:
     bool isDead = false;
     bool leftPressed = false;

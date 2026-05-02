@@ -1,69 +1,236 @@
 #include "RailFencePuzzle.h"
-#include <QGroupBox>    // 修复点
+#include "UIManager.h"
+#include "aichatdialog.h"
+#include "RailFenceVisualizer.h"
+
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLineEdit>
-#include <QMessageBox>
+#include <QPropertyAnimation>
+#include <QHBoxLayout>
+#include <QFrame>
 
-RailFencePuzzle::RailFencePuzzle(QWidget *parent) : QDialog(parent) {
+RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(parent), aiManager(manager) {
+
     setWindowTitle("安全终端 - 栅栏锁");
-    setFixedSize(500, 600); // 稍微调高高度以容纳说明文字
+    setFixedSize(500, 520);
+
+    gameState.puzzleType = "rail_fence";
+    gameState.encryptedText = "HLOOLELWRD";
+    gameState.attemptCount = 0;
+    gameState.solved = false;
+
+    setStyleSheet(R"(
+        QDialog {
+            background-color: #151920;
+        }
+        QLabel {
+            color: #f0e8d8;
+            font-family: 'Microsoft YaHei';
+        }
+        QLabel[role="title"] {
+            font-size: 23px;
+            font-weight: 700;
+            color: #e39b4a;
+        }
+        QLabel[role="subtitle"] {
+            font-size: 14px;
+            color: #cfc3af;
+        }
+        QFrame[role="panel"] {
+            background-color: rgba(41, 31, 23, 178);
+            border-radius: 14px;
+            border: 1px solid rgba(227, 155, 74, 90);
+        }
+        QLabel[role="cipher"] {
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffd89e;
+        }
+        QLabel[role="hint"] {
+            font-size: 15px;
+            color: #e6d8bf;
+        }
+        QLineEdit {
+            background-color: #f7f0e3;
+            color: #231912;
+            border: 2px solid #76502f;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 15px;
+        }
+        QLineEdit:focus {
+            border-color: #e39b4a;
+        }
+        QPushButton {
+            border-radius: 8px;
+            min-height: 38px;
+            padding: 0 16px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        QPushButton[variant="primary"] {
+            background-color: #e39b4a;
+            color: #20160e;
+            border: none;
+        }
+        QPushButton[variant="primary"]:hover {
+            background-color: #f0ae5d;
+        }
+        QPushButton[variant="secondary"] {
+            background-color: rgba(78, 58, 40, 215);
+            color: #f7eedb;
+            border: 1px solid rgba(234, 197, 141, 90);
+        }
+        QPushButton[variant="secondary"]:hover {
+            background-color: rgba(101, 76, 53, 225);
+        }
+    )");
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(28, 24, 28, 24);
+    mainLayout->setSpacing(16);
 
-    // 1. 标题
-    QLabel *title = new QLabel("【第二关】破碎的栅栏 (栅栏密码)");
-    title->setStyleSheet("font-size: 20px; font-weight: bold; color: #E67E22;");
+    QLabel *title = new QLabel("第二关：破碎的栅栏");
+    title->setProperty("role", "title");
     mainLayout->addWidget(title);
 
-    // 2. 密文显示区域
-    QLabel *cipherLabel = new QLabel("密文: HLOOLRDELW\n说明：黑客使用了 2 层栅栏进行加密。");
-    cipherLabel->setStyleSheet("font-family: monospace; font-size: 16px; background: #f0f0f0; padding: 10px; border: 1px solid #ccc;");
-    mainLayout->addWidget(cipherLabel);
+    QLabel *subtitle = new QLabel("把密文拆回两层轨道，再按上下交替还原明文", this);
+    subtitle->setProperty("role", "subtitle");
+    mainLayout->addWidget(subtitle);
 
-    // 3. 详细解密提示（QGroupBox 区域）
-    QGroupBox *tipBox = new QGroupBox("解密指南 (新手必读)");
-    QVBoxLayout *tipLayout = new QVBoxLayout(tipBox);
+    QFrame *cipherPanel = new QFrame(this);
+    cipherPanel->setProperty("role", "panel");
 
-    QLabel *helpText = new QLabel(
-        "什么是栅栏密码 (2层)？\n\n"
-        "就像把一段话拆成两行写，然后再拼起来：\n"
-        "第一行：H   L   O   O   L  (取第1,3,5,7,9个字母)\n"
-        "第二行：  E   L   W   R   D(取第2,4,6,8,10个字母)\n\n"
-        "解密方法：\n"
-        "1. 密文共10个字母，前5个是第一行，后5个是第二行。\n"
-        "2. 第一行：H L O O L\n"
-        "3. 第二行：R D E L W (注意：示例密文对应不同单词)\n"
-        "4. 像拉链一样上下交替读取：1上 -> 1下 -> 2上 -> 2下..."
-        );
-    helpText->setWordWrap(true);
-    helpText->setStyleSheet("color: #555; font-size: 13px;");
-    tipLayout->addWidget(helpText);
-    mainLayout->addWidget(tipBox);
+    QVBoxLayout *cipherLayout = new QVBoxLayout(cipherPanel);
+    cipherLayout->setContentsMargins(20, 18, 20, 18);
+    cipherLayout->setSpacing(10);
 
-    // 4. 输入区域
+    QLabel *cipherTitle = new QLabel("截获密文", cipherPanel);
+    cipherTitle->setProperty("role", "hint");
+
+    QLabel *cipherLabel = new QLabel("HLOOLELWRD", cipherPanel);
+    cipherLabel->setProperty("role", "cipher");
+    cipherLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel *cipherHint = new QLabel("黑客使用了 2 层栅栏进行加密。", cipherPanel);
+    cipherHint->setProperty("role", "hint");
+    cipherHint->setWordWrap(true);
+
+    cipherLayout->addWidget(cipherTitle);
+    cipherLayout->addWidget(cipherLabel);
+    cipherLayout->addWidget(cipherHint);
+
+    mainLayout->addWidget(cipherPanel);
+
+
+    /* =======================
+   🔥 按钮区域（核心修复）
+   ======================= */
+
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    topLayout->setSpacing(12);
+    topLayout->setContentsMargins(0, 0, 0, 0);
+
+    QPushButton *hintButton = new QPushButton("询问神秘提示");
+    hintButton->setFixedHeight(38);
+    hintButton->setProperty("variant", "secondary");
+    hintButton->setCursor(Qt::PointingHandCursor);
+
+    QPushButton *visualBtn = new QPushButton("进入栅栏可视化解密");
+    visualBtn->setFixedHeight(38);
+    visualBtn->setProperty("variant", "secondary");
+    visualBtn->setCursor(Qt::PointingHandCursor);
+
+    topLayout->addWidget(hintButton);
+    topLayout->addStretch();
+    topLayout->addWidget(visualBtn);
+
+    mainLayout->addLayout(topLayout);
+
+    // ✅ 打开AI聊天窗口（核心修改）
+    connect(hintButton, &QPushButton::clicked, this, [=]() {
+
+        AIChatDialog dialog(aiManager, this);
+
+        // ✅ 设置关卡上下文（核心）
+        GameState state;
+        state.puzzleType = "rail_fence";
+        state.encryptedText = gameState.encryptedText;
+        state.userInput = "";
+        state.attemptCount = 0;
+        state.solved = false;
+
+        dialog.setGameState(state);
+
+        dialog.exec();
+    });
+
+    connect(visualBtn, &QPushButton::clicked, this, [=]() {
+
+        RailFenceVisualizer *viz = new RailFenceVisualizer(
+            gameState.encryptedText,
+            this
+            );
+
+        viz->exec();
+    });
+
     inputEdit = new QLineEdit();
     inputEdit->setPlaceholderText("请输入还原后的明文指令...");
-    inputEdit->setFixedHeight(35);
+    inputEdit->setFixedHeight(45);
     mainLayout->addWidget(inputEdit);
 
-    // 5. 验证按钮
+    connect(inputEdit, &QLineEdit::returnPressed, this, &RailFencePuzzle::checkAnswer);
+
     QPushButton *btn2 = new QPushButton("验证指令");
     btn2->setFixedHeight(40);
-    btn2->setStyleSheet("background-color: #E67E22; color: white; font-weight: bold;");
+    btn2->setProperty("variant", "primary");
+    btn2->setCursor(Qt::PointingHandCursor);
     connect(btn2, &QPushButton::clicked, this, &RailFencePuzzle::checkAnswer);
     mainLayout->addWidget(btn2);
 
-    mainLayout->addStretch(); // 底部留白
+    mainLayout->addStretch();
 }
 
+
+// ✅ 震动效果
+void RailFencePuzzle::shakeWindow() {
+    QPoint originalPos = this->pos();
+
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "pos");
+    animation->setDuration(300);
+
+    animation->setKeyValueAt(0, originalPos);
+    animation->setKeyValueAt(0.1, originalPos + QPoint(-10, 0));
+    animation->setKeyValueAt(0.2, originalPos + QPoint(10, 0));
+    animation->setKeyValueAt(0.3, originalPos + QPoint(-10, 0));
+    animation->setKeyValueAt(0.4, originalPos + QPoint(10, 0));
+    animation->setKeyValueAt(0.5, originalPos);
+
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+
+// ❗ 核心逻辑完全不动
 void RailFencePuzzle::checkAnswer() {
-    // 假设正确答案是 HELLOWORLD
     if (inputEdit->text().trimmed().toUpper() == "HELLOWORLD") {
         accept();
     } else {
-        QMessageBox::critical(this, "错误", "指令错误！监测到非法入侵，陷阱已激活！");
-        reject(); // 触发 GameWindow 里的红色尖刺和死亡逻辑
+        shakeWindow();
+
+        UIManager::showErrorDialog("错误", "指令错误！请重新输入！", this);
+        reject();
+        inputEdit->clear();
+        inputEdit->setFocus();
     }
+}
+
+void RailFencePuzzle::requestHint()
+{
+    gameState.attemptCount = attemptCount;
+
+    aiManager->requestHint(gameState, conversationHistory);
 }

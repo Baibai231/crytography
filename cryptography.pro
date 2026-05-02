@@ -4,25 +4,44 @@ CONFIG += c++17
 
 # 确保这三个 cpp 都在列表里
 SOURCES += \
+    aichatdialog.cpp \
+    aimanager.cpp \
     arrow.cpp \
     caesarpuzzle.cpp \
+    gamestate.cpp \
+    inputcontroller.cpp \
+    levelmanager.cpp \
     main.cpp \
     GameWindow.cpp \
     Player.cpp \
+    puzzlemanager.cpp \
     railfencepuzzle.cpp \
+    railfencevisualizer.cpp \
+    spinwheeldialog.cpp \
     startscreen.cpp \
-    videoplayer.cpp
+    terrainblock.cpp \
+    uimanager.cpp \
+    videocontroller.cpp
 
 # 确保这两个 h 都在列表里
 HEADERS += \
     GameWindow.h \
     Player.h \
+    aichatdialog.h \
+    aimanager.h \
     arrow.h \
     caesarpuzzle.h \
+    gamestate.h \
+    inputcontroller.h \
+    levelmanager.h \
+    puzzlemanager.h \
     railfencepuzzle.h \
+    railfencevisualizer.h \
+    spinwheeldialog.h \
     startscreen.h \
     terrainblock.h \
-    videoplayer.h
+    uimanager.h \
+    videocontroller.h
 
 # 只有你创建了资源文件才保留这行
 RESOURCES += \
