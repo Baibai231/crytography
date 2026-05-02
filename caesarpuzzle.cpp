@@ -195,7 +195,7 @@ void CaesarPuzzle::setupPuzzle() {
     answer = words[QRandomGenerator::global()->bounded(words.size())];
 
     // 2. 随机偏移量 (1-5)
-    offset = QRandomGenerator::global()->bounded(1, 6);
+    offset = QRandomGenerator::global()->bounded(1, 25);
 
     // 3. 凯撒加密核心逻辑
     encryptedText = "";

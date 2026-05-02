@@ -25,6 +25,8 @@ public:
     void requestHint(const GameState &state, const QJsonArray &history);
     void requestNextStep(const GameState &state, const QJsonArray &history);
 
+    QString getApiKey() const { return apiKey; }
+
 
 signals:
     void hintReady(const QString &hint);

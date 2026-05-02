@@ -79,6 +79,22 @@ AIChatDialog::AIChatDialog(AIManager *manager, QWidget *parent)
     });
 
     updateInputState();
+
+    if (aiManager->getApiKey().isEmpty()) {
+        // 在对话框里发送第一条离线消息
+        addMessage("【系统提示】AI 导师已就绪。由于网络环境限制，当前处于离线教学模式。您可以继续进行游戏解谜。", false);
+
+        // 彻底禁用输入功能，防止评委点击导致网络请求报错
+        inputEdit->setEnabled(false);
+        sendButton->setEnabled(false);
+        inputEdit->setPlaceholderText("离线模式：无法连接至云端服务器");
+
+        // 可选：让顶部的次数标签也显示离线
+        countLabel->setText("当前模式：离线演示");
+        countLabel->setStyleSheet("color:#888888; font-weight:bold;"); // 变成灰色
+
+        //test
+    }
 }
 
 void AIChatDialog::resizeEvent(QResizeEvent *event)
