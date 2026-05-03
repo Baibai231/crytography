@@ -23,7 +23,7 @@ GameWindow::GameWindow(QWidget *parent)
     connect(gameTimer, &QTimer::timeout, scene, &QGraphicsScene::advance);
 
     aiManager = new AIManager(this);
-    aiManager->setApiKey("sk-");
+    aiManager->setApiKey("");
 
 
     // 初始化各个模块

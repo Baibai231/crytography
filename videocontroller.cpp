@@ -11,7 +11,7 @@ VideoController::VideoController(QObject *parent)
 void VideoController::playVideo(const QString &path, QWidget *parent, std::function<void()> onFinished) {
     Q_UNUSED(path);
 
-    // ===== 1. 创建黑屏窗口 =====
+    // ===== 创建黑屏窗口 =====
     videoWidget = new QWidget(parent);
     videoWidget->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     videoWidget->setStyleSheet("background-color: black;");
@@ -24,9 +24,9 @@ void VideoController::playVideo(const QString &path, QWidget *parent, std::funct
     label->setAlignment(Qt::AlignCenter);
     label->setWordWrap(true);
 
-    // ===== 2. 风格（重点优化） =====
+    // ===== 风格 =====
     label->setStyleSheet(R"(
-        color: #d8c39a;              /* 暗金色，更符合解谜氛围 */
+        color: #d8c39a;              // 暗金色
         font-size: 22px;
         font-family: "Consolas", "Courier New", "Microsoft YaHei";
         letter-spacing: 2px;
@@ -38,12 +38,12 @@ void VideoController::playVideo(const QString &path, QWidget *parent, std::funct
     videoWidget->raise();
     videoWidget->activateWindow();
 
-    // ===== 3. 打字机文本 =====
+    // ===== 打字机文本 =====
     QString fullText =
         "石门上的尘土正在落下...\n"
         "你感受到一股古老的力量正在苏醒。";
 
-    int interval = 100; // 每个字间隔(ms) —— 控制打字速度
+    int interval = 100; // 每个字间隔，控制打字速度
     int *index = new int(0);
 
     QTimer *typeTimer = new QTimer(this);
@@ -55,7 +55,7 @@ void VideoController::playVideo(const QString &path, QWidget *parent, std::funct
         } else {
             typeTimer->stop();
 
-            // ===== 4. 停留一小段时间再结束 =====
+            // ===== 停留一小段时间再结束 =====
             QTimer::singleShot(1000, this, [this, onFinished]() {
 
                 if (videoWidget) {

@@ -202,7 +202,7 @@ void Player::advance(int phase) {
         4
         );
 
-    // ========= ⭐【关键1】全局检测（Arrow / Trap / Door） =========
+    // ========= 全局检测（Arrow / Trap / Door） =========
     QList<QGraphicsItem*> nearby =
         scene()->items(selfRect.adjusted(-5, -5, 5, 5),
                        Qt::IntersectsItemBoundingRect);
@@ -213,7 +213,7 @@ void Player::advance(int phase) {
         QString type = item->data(0).toString();
         QRectF itemRect = item->sceneBoundingRect();
 
-        // ✅ Arrow —— 用整体检测
+        // Arrow —— 用整体检测
         QRectF hitBox = selfRect.adjusted(5, 5, -5, -5);
 
         if (type == "Arrow" && hitBox.intersects(itemRect)) {
@@ -222,14 +222,14 @@ void Player::advance(int phase) {
             return;
         }
 
-        // ✅ Door —— 脚底
+        // Door —— 脚底
         if (type == "Door" && feetRect.intersects(itemRect)) {
             isDead = true;
             if (reachedDoorHandler) reachedDoorHandler();
             return;
         }
 
-        // ✅ Trap —— 脚底
+        // Trap —— 脚底
         if (type == "Trap" && feetRect.intersects(itemRect)) {
             touchingTrap = true;
 
@@ -240,7 +240,7 @@ void Player::advance(int phase) {
         }
     }
 
-    // ========= ⭐【关键2】地面碰撞 =========
+    // ========= 地面碰撞 =========
     bool foundGround = false;
 
     for (QGraphicsItem* item : collidingItems()) {
@@ -352,7 +352,7 @@ void Player::forceKill() {
 QRectF Player::boundingRect() const {
     QRectF rect = QGraphicsPixmapItem::boundingRect();
 
-    // ✂️ 裁掉底部透明区域（根据你图片调整）
+    //️ 裁掉底部透明区域
     rect.adjust(0, 0, 0, -8);
 
     return rect;

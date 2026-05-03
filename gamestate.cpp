@@ -13,7 +13,7 @@ GameState::GameState()
     hintLevel = "low";
 }
 
-// 🔥 用于调试 & 构造 prompt
+// 用于调试并构造 prompt
 QString GameState::toString() const
 {
     QString info;
