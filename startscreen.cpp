@@ -31,50 +31,30 @@ StartScreen::StartScreen(QWidget *parent) : QWidget(parent) {
 
 void StartScreen::applyStyle() {
 
-    // 这里是你后期优化“形态、颜色”的核心区域
-
-    // 使用 QSS 语法，非常方便调整
-
     QString style = R"(
 
         QWidget {
-
             background-color: #2c1f16;
-
         }
 
         QLabel {
-
             color: #f8f3e8;
-
             font-size: 50px;
-
             font-weight: bold;
-
             font-family: "Microsoft YaHei";
-
         }
 
         QPushButton {
-
             background-color: #d7a84e;
-
             color: white;
-
             border-radius: 10px;
-
             padding: 10px;
-
             min-width: 200px;
-
             font-size: 20px;
-
         }
 
         QPushButton:hover {
-
-            background-color: #c8973f; /* 鼠标悬停变色 */
-
+            background-color: #c8973f; //鼠标悬停变色
         }
 
     )";

@@ -80,7 +80,7 @@ void LevelManager::loadLevel(int level) {
     player->setPos(40, 100);
     scene->addItem(player);
 
-    // 信号转发（关键！）
+    // 信号转发
     player->setDeadHandler([this]() {
         emit playerDead();
     });

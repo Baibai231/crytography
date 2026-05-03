@@ -65,11 +65,20 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
             border-color: #e39b4a;
         }
         QPushButton {
+            background-color: #d7a84e;
+            color: #1f160e;
+            font-weight: 700;
             border-radius: 8px;
             min-height: 38px;
             padding: 0 16px;
             font-size: 15px;
-            font-weight: 700;
+            border: none;
+        }
+        QPushButton:hover {
+            background-color: #ecc166;
+        }
+        QPushButton:pressed {
+            background-color: #c8973f;
         }
         QPushButton[variant="primary"] {
             background-color: #e39b4a;
@@ -126,9 +135,6 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
     mainLayout->addWidget(cipherPanel);
 
 
-    /* =======================
-   🔥 按钮区域（核心修复）
-   ======================= */
 
     QHBoxLayout *topLayout = new QHBoxLayout();
     topLayout->setSpacing(12);
@@ -150,12 +156,12 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
 
     mainLayout->addLayout(topLayout);
 
-    // ✅ 打开AI聊天窗口（核心修改）
+    // AI聊天窗口
     connect(hintButton, &QPushButton::clicked, this, [=]() {
 
         AIChatDialog dialog(aiManager, this);
 
-        // ✅ 设置关卡上下文（核心）
+        // 设置关卡上下文
         GameState state;
         state.puzzleType = "rail_fence";
         state.encryptedText = gameState.encryptedText;
@@ -196,7 +202,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
 }
 
 
-// ✅ 震动效果
+// 错误答案震动效果
 void RailFencePuzzle::shakeWindow() {
     QPoint originalPos = this->pos();
 
@@ -214,7 +220,6 @@ void RailFencePuzzle::shakeWindow() {
 }
 
 
-// ❗ 核心逻辑完全不动
 void RailFencePuzzle::checkAnswer() {
     if (inputEdit->text().trimmed().toUpper() == "HELLOWORLD") {
         accept();

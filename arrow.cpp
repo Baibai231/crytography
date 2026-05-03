@@ -6,29 +6,27 @@
 
 Arrow::Arrow(qreal x, qreal y, qreal dir) : direction(dir) {
 
-    // ✅ 1. 加载图片（改成你的路径）
-    QPixmap pix(":/images/arrow.png");   // ⭐ 推荐用资源路径
-    // 如果你不是用资源系统：
-    // QPixmap pix("arrow.png");
+    // 加载图片
+    QPixmap pix(":/images/arrow.png");   // 资源路径
 
     if (pix.isNull()) {
         qDebug() << "箭图片加载失败！";
     }
 
-    // ✅ 2. 放大一点（避免太小检测不到）
+    // 放大一点
     pix = pix.scaled(100, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    // ✅ 3. 根据方向翻转
+    // 根据方向翻转
     if (direction < 0) {
         pix = pix.transformed(QTransform().scale(-1, 1));
     }
 
     setPixmap(pix);
 
-    // ✅ 4. 设置位置（稍微往中间对齐）
+    // 设置位置
     setPos(x, y);
 
-    // ✅ 5. 标记类型（非常重要）
+    // 标记类型
     setData(0, "Arrow");
 }
 
@@ -45,6 +43,6 @@ void Arrow::advance(int phase) {
 
 QPainterPath Arrow::shape() const {
     QPainterPath path;
-    path.addRect(boundingRect()); // ✅ 用矩形保证命中
+    path.addRect(boundingRect()); // 用矩形保证命中
     return path;
 }

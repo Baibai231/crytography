@@ -156,7 +156,7 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
     layout->addWidget(btn);
     layout->addLayout(bottomLayout);
 
-    // 连接信号
+
     connect(btn, &QPushButton::clicked, this, &CaesarPuzzle::checkAnswer);
 
     connect(visualBtn, &QPushButton::clicked, this, [=]() {
@@ -181,7 +181,7 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
         state.attemptCount = 0;
         state.solved = false;
 
-        // ✅ 传入AI对话框
+        // 传入AI对话框
         dialog.setGameState(state);
 
 
@@ -190,14 +190,14 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
 }
 
 void CaesarPuzzle::setupPuzzle() {
-    // 1. 词库
+    // 词库
     QStringList words = {"PIXEL", "SWORD", "LEVEL", "HERO", "MAGIC", "QUEST", "DOOR", "GATE"};
     answer = words[QRandomGenerator::global()->bounded(words.size())];
 
-    // 2. 随机偏移量 (1-5)
+    // 随机偏移量
     offset = QRandomGenerator::global()->bounded(1, 25);
 
-    // 3. 凯撒加密核心逻辑
+    // 凯撒密码逻辑
     encryptedText = "";
     for(QChar c : answer) {
         int originalPos = c.toLatin1() - 'A';
