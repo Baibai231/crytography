@@ -127,15 +127,15 @@ void AIChatDialog::addMessage(const QString &text, bool isUser)
 
     QString cleanText = text;
 
-    // 去掉首尾空白（包括 \n）
+    // 去掉首尾空白
     cleanText = cleanText.trimmed();
 
-    // ❗关键：去掉多余换行（特别是开头）
+    // 去掉多余换行
     while (cleanText.startsWith("\n")) {
         cleanText.remove(0, 1);
     }
 
-    // ❗可选：限制连续空行（防止AI乱排版）
+    // 限制连续空行
     cleanText.replace("\n\n\n", "\n\n");
 
     QLabel *msg = new QLabel(cleanText);
@@ -287,11 +287,9 @@ void AIChatDialog::sendMessage()
     waitingForReply = true;
     updateInputState();
 
-    // 更新 GameState
     gameState.userInput = text;
     gameState.attemptCount = askCount;
 
-    // 调用新接口
     aiManager->requestHint(gameState, conversationHistory);
 }
 

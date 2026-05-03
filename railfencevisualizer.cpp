@@ -74,7 +74,7 @@ void RailFenceVisualizer::buildUI()
 
     mainLayout->addLayout(topLayout);
 
-    // ================= 栅栏数选择（🔥新增） =================
+    // ================= 栅栏数选择 =================
     QHBoxLayout *controlLayout = new QHBoxLayout();
 
     QLabel *label = new QLabel("栅栏数：");
@@ -82,7 +82,7 @@ void RailFenceVisualizer::buildUI()
     keyDial = new QDial(this);
     keyDial->setRange(2, 5);
     keyDial->setValue(2);
-    keyDial->setNotchesVisible(true);   // ⭐刻度点
+    keyDial->setNotchesVisible(true);
     keyDial->setFixedSize(80, 80);
 
     QLabel *valueLabel = new QLabel("2");
@@ -116,7 +116,7 @@ void RailFenceVisualizer::buildUI()
 
     mainLayout->addWidget(slider);
 
-    // ================= 结果显示（🔥新增） =================
+    // ================= 结果显示 =================
     resultLabel = new QLabel("结果：");
     resultLabel->setStyleSheet("font-size:16px;color:#ddd;");
     resultLabel->setTextFormat(Qt::RichText);
@@ -150,7 +150,7 @@ void RailFenceVisualizer::buildFence()
     }
 }
 
-// ================= buildSteps（核心） =================
+// ================= buildSteps =================
 void RailFenceVisualizer::buildSteps()
 {
     steps.clear();
@@ -186,7 +186,7 @@ void RailFenceVisualizer::buildSteps()
 
     path.clear();
 
-    int row2 = 0, dir2 = 1;   // ⭐重新开始
+    int row2 = 0, dir2 = 1;   // 重新开始
 
     for (int col = 0; col < n; col++) {
 
@@ -256,7 +256,7 @@ void RailFenceVisualizer::playNextStep()
         animTimer->stop();
         isPlaying = false;
 
-        showResult();   // ⭐关键调用
+        showResult();
         return;
     }
 }
