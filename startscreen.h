@@ -19,14 +19,14 @@ private slots:
     void showReleaseNotes(); // 显示发行说明
 
 private:
-    // 成员变量，方便后期动态调整
+    // 成员变量
     QVBoxLayout *mainLayout;
     QLabel *titleLabel;
     QPushButton *startBtn;
     QPushButton *howToPlayBtn;
     QPushButton *releaseBtn;
 
-    void applyStyle(); // 统一设置样式的地方
+    void applyStyle(); // 统一设置样式
 };
 
 #endif

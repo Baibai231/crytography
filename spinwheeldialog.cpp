@@ -74,7 +74,7 @@ void SpinWheelDialog::updateUI(int offset)
 
     resultLabel->setText(result);
 
-    // ✔ 如果完全正确 → 亮
+    // 如果完全正确 → 亮
     if (result == plainText)
     {
         setStyleSheet("background-color:#2b2a1f; color:#ffffff;");

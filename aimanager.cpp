@@ -128,7 +128,7 @@ void AIManager::onReplyFinished(QNetworkReply *reply)
 
     QString content = choices[0].toObject()["message"].toObject()["content"].toString();
 
-    // 简单防剧透处理（可扩展）
+    // 防剧透处理
     if (content.length() > 200) {
         content = content.left(200) + "...";
     }
