@@ -39,7 +39,6 @@ private:
     QGraphicsScene *scene = nullptr;
     QTimer *gameTimer = nullptr;
 
-    // 新模块
     LevelManager *levelManager = nullptr;
     InputController *inputController = nullptr;
     UIManager *uiManager = nullptr;

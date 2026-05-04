@@ -9,7 +9,7 @@
 #include "gamestate.h"
 
 struct PuzzleContext {
-    QString type;      // e.g. "caesar"
+    QString type;
     QString content;   // encrypted text
     QString progress;  // optional player progress
 };

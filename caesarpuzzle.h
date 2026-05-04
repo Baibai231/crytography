@@ -5,7 +5,6 @@
 
 #include "aimanager.h"
 
-// 前向声明，减少头文件依赖
 class QLineEdit;
 class QLabel;
 
@@ -34,7 +33,7 @@ private:
 protected:
     // 当点击对话框右上角“X”关闭时，Qt 默认会触发 reject()
     void reject() override {
-        QDialog::reject(); // 保持默认行为
+        QDialog::reject();
     }
 };
 

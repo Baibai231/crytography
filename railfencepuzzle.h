@@ -22,9 +22,9 @@ private slots:
 private:
     QLineEdit *inputEdit;
 
-    QString answer = "HELLOWORLD"; // 保留你的答案（虽然当前cpp没用）
+    QString answer = "HELLOWORLD";
 
-    void shakeWindow();  // ✅ 必须新增（用于震动效果）
+    void shakeWindow();  // 震动效果
 
     AIManager *aiManager;
     GameState gameState;

@@ -155,7 +155,7 @@ int UIManager::showDeathDialog(int level, QWidget *parent) {
 
     mainLayout->addLayout(buttonLayout);
 
-    // 返回值设计（很关键）
+    // 返回值设计
     connect(retryBtn, &QPushButton::clicked, &dialog, [&dialog]() {
         dialog.done(1);
     });
