@@ -26,7 +26,7 @@ void VideoController::playVideo(const QString &path, QWidget *parent, std::funct
 
     // ===== 风格 =====
     label->setStyleSheet(R"(
-        color: #d8c39a;              // 暗金色
+        color: #d8c39a;              /* 暗金色 */
         font-size: 22px;
         font-family: "Consolas", "Courier New", "Microsoft YaHei";
         letter-spacing: 2px;
