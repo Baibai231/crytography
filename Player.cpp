@@ -3,6 +3,7 @@
 #include <QRectF>
 #include <QTransform>
 
+
 Player::Player() {
     runFrames.clear();
     jumpFrames.clear();

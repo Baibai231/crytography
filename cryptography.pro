@@ -11,8 +11,11 @@ SOURCES += \
     gamestate.cpp \
     inputcontroller.cpp \
     levelmanager.cpp \
+    levelselectdialog.cpp \
     main.cpp \
     GameWindow.cpp \
+    miniaespuzzle.cpp \
+    miniaesvisualizer.cpp \
     Player.cpp \
     puzzlemanager.cpp \
     railfencepuzzle.cpp \
@@ -21,7 +24,9 @@ SOURCES += \
     startscreen.cpp \
     terrainblock.cpp \
     uimanager.cpp \
-    videocontroller.cpp
+    videocontroller.cpp \
+    vigenerepuzzle.cpp \
+    vigenerevisualizer.cpp
 
 # 确保这两个 h 都在列表里
 HEADERS += \
@@ -31,9 +36,13 @@ HEADERS += \
     aimanager.h \
     arrow.h \
     caesarpuzzle.h \
+    gameprogress.h \
     gamestate.h \
     inputcontroller.h \
     levelmanager.h \
+    levelselectdialog.h \
+    miniaespuzzle.h \
+    miniaesvisualizer.h \
     puzzlemanager.h \
     railfencepuzzle.h \
     railfencevisualizer.h \
@@ -41,7 +50,9 @@ HEADERS += \
     startscreen.h \
     terrainblock.h \
     uimanager.h \
-    videocontroller.h
+    videocontroller.h \
+    vigenerepuzzle.h \
+    vigenerevisualizer.h
 
 # 只有你创建了资源文件才保留这行
 RESOURCES += \

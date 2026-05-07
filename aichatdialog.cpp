@@ -12,6 +12,7 @@
 #include <QShowEvent>
 #include <QTimer>
 
+
 namespace {
 
 constexpr int kBubbleTextPadding = 6;

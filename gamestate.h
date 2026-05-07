@@ -3,6 +3,7 @@
 
 #include <QString>
 
+
 // 游戏状态：用于传递给 AI 的上下文信息
 class GameState
 {

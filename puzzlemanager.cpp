@@ -1,6 +1,8 @@
 #include "PuzzleManager.h"
 #include "CaesarPuzzle.h"
 #include "RailFencePuzzle.h"
+#include "VigenerePuzzle.h"
+#include "MiniAESPuzzle.h"
 
 #include <QDialog>
 
@@ -14,6 +16,14 @@ bool PuzzleManager::runPuzzle(int level, QWidget *parent) {
     }
     else if (level == 2) {
         RailFencePuzzle puzzle(aiManager,parent);
+        return (puzzle.exec() == QDialog::Accepted);
+    }
+    else if (level == 3) {
+        VigenerePuzzle puzzle(aiManager,parent);
+        return (puzzle.exec() == QDialog::Accepted);
+    }
+    else if (level == 4) {
+        MiniAESPuzzle puzzle(aiManager,parent);
         return (puzzle.exec() == QDialog::Accepted);
     }
 

@@ -5,6 +5,7 @@
 
 #include "aimanager.h"
 
+
 class QLineEdit;
 class QLabel;
 

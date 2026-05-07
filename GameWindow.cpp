@@ -6,11 +6,13 @@
 #include "PuzzleManager.h"
 #include "VideoController.h"
 #include "uimanager.h"
+#include "GameProgress.h"
 
 #include <QKeyEvent>
 #include <QPainter>
 #include <QShowEvent>
 #include <QApplication>
+
 
 GameWindow::GameWindow(QWidget *parent)
     : QGraphicsView(parent) {
@@ -57,7 +59,7 @@ void GameWindow::setBackToMenuHandler(const std::function<void()> &handler) {
     backToMenuHandler = handler;
 }
 
-void GameWindow::startNewGame() {
+void GameWindow::startNewGame(int level) {
 
     QPixmap originalBg(":/images/maya_bg.png");
     if (!originalBg.isNull()) {
@@ -65,7 +67,7 @@ void GameWindow::startNewGame() {
         cachedBackground = applyOpacity(scaled, 0.5);
     }
 
-    levelManager->loadLevel(1);
+    levelManager->loadLevel(level);
     player = levelManager->getPlayer();
 
     inputController->setPlayer(player);
@@ -119,27 +121,49 @@ void GameWindow::onPlayerDead() {
 void GameWindow::onReachedDoor() {
     gameTimer->stop();
 
-    videoController->playVideo("placeholder_path", this, [this]() {
+    int level = levelManager->getCurrentLevel();
+    QString videoText;
 
-        bool success = puzzleManager->runPuzzle(levelManager->getCurrentLevel(), this);
+    if (level == 1) {
+        videoText = "石门缓缓开启，古老的凯撒密文在墙壁上闪烁...\n你感觉到一股来自罗马时代的力量。";
+    } else if (level == 2) {
+        videoText = "穿越破碎的栅栏，你来到一个充满电路与代码的密室...\n黑客留下的痕迹依然清晰。";
+    } else if (level == 3) {
+        videoText = "两面相对的镜子折射出无限的光芒...\n对称的祭坛等待密钥的唤醒。";
+    } else {
+        videoText = "黄金矩阵在黑暗中浮现，四个格子闪烁着神秘的光芒...\nMini-AES 的核心密钥，等待被破解。";
+    }
+
+    videoController->playVideo("placeholder_path", videoText, this, [this, level]() {
+        bool success = puzzleManager->runPuzzle(level, this);
 
         if (success) {
-            if (levelManager->getCurrentLevel() == 1) {
-                uiManager->showInfo("成功", "凯撒加密已破解！", this);
+            GameProgress::unlockLevel(level + 1);
 
+            if (level == 1) {
+                uiManager->showInfo("成功", "凯撒加密已破解！", this);
                 levelManager->loadLevel(2);
-                player = levelManager->getPlayer();
-                inputController->setPlayer(player);
-                gameTimer->start(16);
+            }
+            else if (level == 2) {
+                uiManager->showInfo("成功", "栅栏密码已破解！祭坛的轮廓正在显现。", this);
+                levelManager->loadLevel(3);
+            }
+            else if (level == 3) {
+                uiManager->showInfo("成功", "维吉尼亚对称密码已破解！矩阵实验室的门缓缓打开。", this);
+                levelManager->loadLevel(4);
             }
             else {
-                uiManager->showInfo("成功", "栅栏密码已破解！你已彻底清除病毒。", this);
-
+                uiManager->showInfo("通关", "Mini-AES 矩阵之钥已被破解！神庙的力量已被你掌控。", this);
                 hide();
                 if (backToMenuHandler) {
                     backToMenuHandler();
                 }
+                return;
             }
+
+            player = levelManager->getPlayer();
+            inputController->setPlayer(player);
+            gameTimer->start(16);
         }
         else {
             handlePuzzleFailed();

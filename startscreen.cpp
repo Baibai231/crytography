@@ -1,4 +1,5 @@
 #include "StartScreen.h"
+#include "LevelSelectDialog.h"
 #include "UIManager.h"
 
 StartScreen::StartScreen(QWidget *parent) : QWidget(parent) {
@@ -6,61 +7,52 @@ StartScreen::StartScreen(QWidget *parent) : QWidget(parent) {
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->setSpacing(20); // 按钮之间的间距
+    mainLayout->setSpacing(20);
 
     titleLabel = new QLabel("像素大冒险", this);
 
     startBtn = new QPushButton("开始游戏", this);
+    selectLevelBtn = new QPushButton("选择关卡", this);
     howToPlayBtn = new QPushButton("游戏玩法", this);
     releaseBtn = new QPushButton("发行说明", this);
 
-    // 添加到布局
+    // Add to layout
     mainLayout->addWidget(titleLabel);
-    mainLayout->addSpacing(30); // 标题和按钮之间的额外距离
+    mainLayout->addSpacing(30);
     mainLayout->addWidget(startBtn);
+    mainLayout->addWidget(selectLevelBtn); // Added
     mainLayout->addWidget(howToPlayBtn);
     mainLayout->addWidget(releaseBtn);
 
-    // 信号连接
+    // Signals
     connect(startBtn, &QPushButton::clicked, this, &StartScreen::startClicked);
+    connect(selectLevelBtn, &QPushButton::clicked, this, &StartScreen::showLevelSelect);
     connect(howToPlayBtn, &QPushButton::clicked, this, &StartScreen::showHowToPlay);
     connect(releaseBtn, &QPushButton::clicked, this, &StartScreen::showReleaseNotes);
 
-    applyStyle(); // 调用样式设置
+    applyStyle();
+}
+
+void StartScreen::showLevelSelect() {
+    LevelSelectDialog dialog(this);
+    connect(&dialog, &LevelSelectDialog::levelSelected, this, &StartScreen::levelSelected);
+    dialog.exec();
 }
 
 void StartScreen::applyStyle() {
-
     QString style = R"(
-
-        QWidget {
-            background-color: #2c1f16;
+        QWidget { background-color: #2c1f16; }
+        QLabel { color: #f8f3e8; font-size: 50px; font-weight: bold; font-family: "Microsoft YaHei"; }
+        QPushButton { 
+            background-color: #d7a84e; color: white; border-radius: 10px; padding: 10px; 
+            min-width: 200px; font-size: 20px; 
         }
-
-        QLabel {
-            color: #f8f3e8;
-            font-size: 50px;
-            font-weight: bold;
-            font-family: "Microsoft YaHei";
-        }
-
-        QPushButton {
-            background-color: #d7a84e;
-            color: white;
-            border-radius: 10px;
-            padding: 10px;
-            min-width: 200px;
-            font-size: 20px;
-        }
-
-        QPushButton:hover {
-            background-color: #c8973f; //鼠标悬停变色
-        }
-
+        QPushButton:hover { background-color: #c8973f; }
     )";
 
     this->setStyleSheet(style);
 }
+
 void StartScreen::showHowToPlay() {
     UIManager::showInfoDialog("游戏玩法",
                               "A 键：向左移动\n"

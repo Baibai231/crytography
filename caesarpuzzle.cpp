@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QRandomGenerator>
 
+
 CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent), aiManager(manager) {
 
     setWindowTitle("古老的封印");
