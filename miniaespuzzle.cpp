@@ -111,8 +111,8 @@ MiniAESPuzzle::MiniAESPuzzle(AIManager *manager, QWidget *parent)
 void MiniAESPuzzle::generatePuzzle() {
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++) {
-            m_plainText[i][j] = QRandomGenerator::global()->bounded(16);
-            m_key[i][j] = QRandomGenerator::global()->bounded(16);
+            m_plainText[i][j] = QRandomGenerator::global()->bounded(256);
+            m_key[i][j] = QRandomGenerator::global()->bounded(256);
         }
 
     MiniAESVisualizer::encrypt(m_plainText, m_key, m_cipherText);
@@ -126,8 +126,8 @@ void MiniAESPuzzle::generatePuzzle() {
 
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++) {
-            m_phase2Plain[i][j] = QRandomGenerator::global()->bounded(16);
-            m_phase2Key[i][j] = QRandomGenerator::global()->bounded(16);
+            m_phase2Plain[i][j] = QRandomGenerator::global()->bounded(256);
+            m_phase2Key[i][j] = QRandomGenerator::global()->bounded(256);
         }
     int cipher2[2][2];
     MiniAESVisualizer::encrypt(m_phase2Plain, m_phase2Key, cipher2);
@@ -141,12 +141,12 @@ void MiniAESPuzzle::generatePuzzle() {
     int key3[2][2];
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++)
-            key3[i][j] = QRandomGenerator::global()->bounded(16);
+            key3[i][j] = QRandomGenerator::global()->bounded(256);
 
     int plain3[2][2];
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++)
-            plain3[i][j] = QRandomGenerator::global()->bounded(16);
+            plain3[i][j] = QRandomGenerator::global()->bounded(256);
 
     MiniAESVisualizer::encrypt(plain3, key3, m_phase3Cipher);
 
@@ -188,10 +188,10 @@ QWidget* MiniAESPuzzle::createMatrixWidget(const QString &label, int data[2][2],
         for (int j = 0; j < 2; j++) {
             QLabel *cell = new QLabel(MiniAESVisualizer::toHex(data[i][j]));
             cell->setAlignment(Qt::AlignCenter);
-            cell->setFixedSize(50, 50);
+            cell->setFixedSize(60, 56);
             cell->setStyleSheet(QString(
                 "background-color: #1a1e26; border: 2px solid %1; border-radius: 6px;"
-                "color: %2; font-size: 20px; font-weight: 700;"
+                "color: %2; font-size: 18px; font-weight: 700;"
                 "font-family: Consolas, 'Courier New', monospace;"
             ).arg(accentColor).arg(accentColor));
             gridLayout->addWidget(cell, i, j);
@@ -238,7 +238,7 @@ void MiniAESPuzzle::setupPhase1() {
     layout->addWidget(instruction);
 
     m_inputEdit1 = new QLineEdit();
-    m_inputEdit1->setPlaceholderText("观察后输入最终密文（4位十六进制，如 3A7F）...");
+    m_inputEdit1->setPlaceholderText("观察后输入最终密文（8位十六进制，如 3A1F7C9B）...");
     m_inputEdit1->setAlignment(Qt::AlignCenter);
     m_inputEdit1->setFixedHeight(45);
     layout->addWidget(m_inputEdit1);
@@ -283,7 +283,7 @@ void MiniAESPuzzle::setupPhase2() {
     layout->addWidget(panel);
 
     m_inputEdit2 = new QLineEdit();
-    m_inputEdit2->setPlaceholderText("请输入加密后的密文（4位十六进制）...");
+    m_inputEdit2->setPlaceholderText("请输入加密后的密文（8位十六进制）...");
     m_inputEdit2->setAlignment(Qt::AlignCenter);
     m_inputEdit2->setFixedHeight(45);
     layout->addWidget(m_inputEdit2);
@@ -328,7 +328,7 @@ void MiniAESPuzzle::setupPhase3() {
     layout->addWidget(panel);
 
     m_inputEdit3 = new QLineEdit();
-    m_inputEdit3->setPlaceholderText("请输入解密后的明文（4位十六进制）...");
+    m_inputEdit3->setPlaceholderText("请输入解密后的明文（8位十六进制）...");
     m_inputEdit3->setAlignment(Qt::AlignCenter);
     m_inputEdit3->setFixedHeight(45);
     layout->addWidget(m_inputEdit3);

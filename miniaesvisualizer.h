@@ -22,7 +22,7 @@ public:
 
     const QList<AesStep>& getSteps() const { return m_steps; }
 
-    static const int SBOX[16];
+    static const int SBOX[256];
     static QString toHex(int v);
     static void encrypt(int plain[2][2], int key[2][2], int result[2][2]);
     static QList<AesStep> generateSteps(int plain[2][2], int key[2][2]);
@@ -31,6 +31,7 @@ private slots:
     void prevStep();
     void nextStep();
     void toggleAutoPlay();
+    void showSBoxPopup();
 
 private:
     void setupUI();
@@ -49,7 +50,6 @@ private:
     QLabel *m_stepNameLabel;
     QLabel *m_stepDetailLabel;
     QLabel *m_stepCounterLabel;
-    QLabel *m_sboxLabels[4][4];
     QPushButton *m_prevBtn;
     QPushButton *m_nextBtn;
     QPushButton *m_autoBtn;
