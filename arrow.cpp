@@ -7,7 +7,7 @@
 Arrow::Arrow(qreal x, qreal y, qreal dir) : direction(dir) {
 
     // 加载图片
-    QPixmap pix(":/images/arrow.png");   // 资源路径
+    QPixmap pix(":/images/arrow.png");
 
     if (pix.isNull()) {
         qDebug() << "箭图片加载失败！";

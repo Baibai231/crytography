@@ -8,7 +8,7 @@
 VideoController::VideoController(QObject *parent)
     : QObject(parent) {}
 
-void VideoController::playVideo(const QString &path, QWidget *parent, std::function<void()> onFinished) {
+void VideoController::playVideo(const QString &path, const QString &storyText, QWidget *parent, std::function<void()> onFinished) {
     Q_UNUSED(path);
 
     // ===== 创建黑屏窗口 =====
@@ -39,9 +39,8 @@ void VideoController::playVideo(const QString &path, QWidget *parent, std::funct
     videoWidget->activateWindow();
 
     // ===== 打字机文本 =====
-    QString fullText =
-        "石门上的尘土正在落下...\n"
-        "你感受到一股古老的力量正在苏醒。";
+    QString fullText = storyText.isEmpty() ? 
+        "石门上的尘土正在落下...\n你感受到一股古老的力量正在苏醒。" : storyText;
 
     int interval = 100; // 每个字间隔，控制打字速度
     int *index = new int(0);

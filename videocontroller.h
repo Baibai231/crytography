@@ -12,7 +12,7 @@ class VideoController : public QObject {
 public:
     explicit VideoController(QObject *parent = nullptr);
 
-    void playVideo(const QString &path, QWidget *parent, std::function<void()> onFinished);
+    void playVideo(const QString &path, const QString &storyText, QWidget *parent, std::function<void()> onFinished);
 
 private:
     QWidget *videoWidget = nullptr; // 内部管理窗口

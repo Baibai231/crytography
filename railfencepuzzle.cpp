@@ -32,7 +32,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
         QLabel[role="title"] {
             font-size: 23px;
             font-weight: 700;
-            color: #e39b4a;
+            color: #e4b45f;
         }
         QLabel[role="subtitle"] {
             font-size: 14px;
@@ -41,7 +41,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
         QFrame[role="panel"] {
             background-color: rgba(41, 31, 23, 178);
             border-radius: 14px;
-            border: 1px solid rgba(227, 155, 74, 90);
+            border: 1px solid rgba(228, 180, 95, 90);
         }
         QLabel[role="cipher"] {
             font-family: Consolas, 'Courier New', monospace;
@@ -62,7 +62,7 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
             font-size: 15px;
         }
         QLineEdit:focus {
-            border-color: #e39b4a;
+            border-color: #e4b45f;
         }
         QPushButton {
             background-color: #d7a84e;
@@ -79,14 +79,6 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
         }
         QPushButton:pressed {
             background-color: #c8973f;
-        }
-        QPushButton[variant="primary"] {
-            background-color: #e39b4a;
-            color: #20160e;
-            border: none;
-        }
-        QPushButton[variant="primary"]:hover {
-            background-color: #f0ae5d;
         }
         QPushButton[variant="secondary"] {
             background-color: rgba(78, 58, 40, 215);
@@ -193,7 +185,6 @@ RailFencePuzzle::RailFencePuzzle(AIManager *manager, QWidget *parent) : QDialog(
 
     QPushButton *btn2 = new QPushButton("验证指令");
     btn2->setFixedHeight(40);
-    btn2->setProperty("variant", "primary");
     btn2->setCursor(Qt::PointingHandCursor);
     connect(btn2, &QPushButton::clicked, this, &RailFencePuzzle::checkAnswer);
     mainLayout->addWidget(btn2);

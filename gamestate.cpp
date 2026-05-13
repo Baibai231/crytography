@@ -1,5 +1,6 @@
 #include "gamestate.h"
 
+
 GameState::GameState()
 {
     puzzleType = "";

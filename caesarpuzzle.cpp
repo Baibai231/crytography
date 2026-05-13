@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QRandomGenerator>
 
+
 CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent), aiManager(manager) {
 
     setWindowTitle("古老的封印");
@@ -79,6 +80,13 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
         QPushButton:pressed {
             background-color: #c8973f;
         }
+        QPushButton[variant="secondary"] {
+            background-color: rgba(78, 58, 40, 215); color: #f7eedb;
+            border: 1px solid rgba(234, 197, 141, 90);
+        }
+        QPushButton[variant="secondary"]:hover {
+            background-color: rgba(101, 76, 53, 225);
+        }
     )");
 
     setupPuzzle(); // 初始化题目
@@ -87,7 +95,7 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
     layout->setContentsMargins(28, 26, 28, 26);
     layout->setSpacing(18);
 
-    QLabel *title = new QLabel("石门上的刻痕", this);
+    QLabel *title = new QLabel("第一关：石门上的刻痕", this);
     title->setProperty("role", "title");
     title->setAlignment(Qt::AlignCenter);
 
@@ -124,14 +132,17 @@ CaesarPuzzle::CaesarPuzzle(AIManager *manager,QWidget *parent) : QDialog(parent)
     inputEdit->setAlignment(Qt::AlignCenter);
 
     QPushButton *visualBtn = new QPushButton("进入解密转盘", this);
+    visualBtn->setProperty("variant", "secondary");
+    visualBtn->setFixedHeight(40);
     visualBtn->setCursor(Qt::PointingHandCursor);
-
 
     QPushButton *btn = new QPushButton("破译封印", this);
     btn->setCursor(Qt::PointingHandCursor);
     connect(inputEdit, &QLineEdit::returnPressed, this, &CaesarPuzzle::checkAnswer);
 
     QPushButton *hintBtn = new QPushButton("询问神秘提示", this);
+    hintBtn->setProperty("variant", "secondary");
+    hintBtn->setFixedHeight(40);
     hintBtn->setCursor(Qt::PointingHandCursor);
 
     layout->addWidget(title);

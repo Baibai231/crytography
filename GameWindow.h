@@ -22,7 +22,7 @@ public:
     explicit GameWindow(QWidget *parent = nullptr);
 
     void setBackToMenuHandler(const std::function<void()> &handler);
-    void startNewGame();
+    void startNewGame(int level = 1); // Allow specifying start level
 
     QPixmap applyOpacity(const QPixmap &source, qreal opacity);
 
@@ -33,7 +33,6 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void drawBackground(QPainter *painter, const QRectF &rect) override;
-
 
 private:
     QGraphicsScene *scene = nullptr;
@@ -51,6 +50,7 @@ private:
 
     void onPlayerDead();
     void onReachedDoor();
+    void updateProgress(); // New helper to save progress
 
     QPixmap cachedBackground;
 

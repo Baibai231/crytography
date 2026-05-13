@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include "gamestate.h"
 
+
 struct PuzzleContext {
     QString type;
     QString content;   // encrypted text

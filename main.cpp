@@ -1,6 +1,8 @@
 #include <QApplication>
 #include "GameWindow.h"
 #include "StartScreen.h"
+#include "GameProgress.h"
+
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -14,7 +16,14 @@ int main(int argc, char *argv[]) {
     QObject::connect(&start, &StartScreen::startClicked, [&]() {
         start.hide();
         w.show();
-        w.startNewGame();
+        w.startNewGame(GameProgress::getMaxUnlockedLevel());
+    });
+
+    // 从开始菜单选择关卡
+    QObject::connect(&start, &StartScreen::levelSelected, [&](int level) {
+        start.hide();
+        w.show();
+        w.startNewGame(level);
     });
 
     // 从游戏窗口回到菜单

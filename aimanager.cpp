@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 //#include <QDebug>
 
+
 AIManager::AIManager(QObject *parent)
     : QObject(parent)
 {
