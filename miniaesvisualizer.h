@@ -17,15 +17,18 @@ class MiniAESVisualizer : public QDialog {
     Q_OBJECT
 
 public:
-    enum Mode { Demo, Interactive };
+    enum Mode { Demo, Interactive, Encrypt, Decrypt };
     explicit MiniAESVisualizer(int plain[2][2], int key[2][2], Mode mode = Demo, QWidget *parent = nullptr);
 
     const QList<AesStep>& getSteps() const { return m_steps; }
 
     static const int SBOX[256];
+    static const int INVSBOX[256];
     static QString toHex(int v);
     static void encrypt(int plain[2][2], int key[2][2], int result[2][2]);
+    static void decrypt(int cipher[2][2], int key[2][2], int result[2][2]);
     static QList<AesStep> generateSteps(int plain[2][2], int key[2][2]);
+    static QList<AesStep> generateDecryptSteps(int cipher[2][2], int key[2][2]);
 
 private slots:
     void prevStep();
